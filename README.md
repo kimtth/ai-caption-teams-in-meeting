@@ -69,6 +69,10 @@ Connections                   ttl     opn     rt1     rt5     p50     p90
 
     `https://fluentsite.z22.web.core.windows.net/`
 
+6) Microsoft Administrator Account
+
+    Administrator: tataKim@aicaption.onmicrosoft.com
+
 ## Prerequisites
 -  [NodeJS](https://nodejs.org/en/)
 

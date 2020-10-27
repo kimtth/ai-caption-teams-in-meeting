@@ -4,8 +4,8 @@
 import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Menu, Flex, FlexItem, Text, Button } from '@fluentui/react-northstar'
-import { TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon } from '@fluentui/react-icons-northstar'
+import { List, Divider, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
+import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon } from '@fluentui/react-icons-northstar'
 /**
  * The 'GroupTab' component renders the main tab content
  * of your app.
@@ -17,7 +17,7 @@ function Tab(props) {
     // Get the user context from Teams and set it in the state
     microsoftTeams.getContext((teamContext, error) => {
       setContext(teamContext);
-      alert(JSON.stringify(teamContext, null, 4));
+      //alert(JSON.stringify(teamContext, null, 4));
     });
     // Next steps: Error handling using the error object
   }, [setContext])
@@ -38,22 +38,60 @@ function Tab(props) {
     },
   ]
 
+  const fakeListContents = () => {
+    const contents = Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      i => (
+        [{
+          key: i,
+          media: <SpeakerPersonIcon size="medium" />,
+          header: `${userName.split('@')[0]} ${i}`,
+          headerMedia: "7:26:56 AM",
+          content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.${i}`,
+          endMedia: <EditIcon size="small" />,
+          style: { marginBottom: '3px' }
+        },
+        {
+          key: i,
+          media: <TranslationIcon size="medium" />,
+          content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.${i}`,
+        },
+        <Divider color="brand" fitted />]
+      )
+    );
+    const flatMap = [].concat.apply([], contents);
+    return flatMap;
+  }
+
+  // const tightDivider = () => (
+  //   <p
+  //     style={{
+  //       padding: '0',
+  //       margin: '0',
+  //     }}
+  //   />
+  // );
+
   return (
     <>
       <Flex
         gap="gap.small"
-        className="wrapper"
+        styles={{ width: '315px' }}
         padding="padding.medium"
         column={true}
       >
         <FlexItem
           align='center'
         >
-          <Menu defaultActiveIndex={0} items={items} primary />
+          <Menu defaultActiveIndex={0} items={items} pointing="start" primary />
         </FlexItem>
-        <FlexItem>
-          <Text size="medium" content={`Congratulations ${userName}! The tab you made :-)`} />
-        </FlexItem>
+      </Flex>
+      <Flex
+        gap="gap.medium"
+        styles={{ width: '315px', height: '80vh', overflowX: 'hidden', overflowY: 'auto' }}
+        vAlign='start'
+        column={true}
+      >
+        <List items={fakeListContents()} />
       </Flex>
       <Flex
         gap="gap.small"

@@ -22,3 +22,25 @@ h2 {
   width: 315px;
   height: 90vh;
 }
+
+/*Kim: Custom scroll bar*/
+/* total width */
+::-webkit-scrollbar {
+  background-color:rgb(80, 80, 80);
+  width:10px
+}
+
+/* background of the scrollbar except button or resizer */
+::-webkit-scrollbar-track {
+  background-color:rgb(80, 80, 80)
+}
+
+/* scrollbar itself */
+::-webkit-scrollbar-thumb {
+  background-color:#202727;
+  border-radius:10px;
+  border:1px solid rgb(80, 80, 80)
+}
+
+/* set button(top and bottom of the scrollbar) */
+::-webkit-scrollbar-button {display:none}
