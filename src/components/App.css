@@ -27,7 +27,7 @@ h2 {
 /* total width */
 ::-webkit-scrollbar {
   background-color:rgb(80, 80, 80);
-  width:10px
+  width:8px
 }
 
 /* background of the scrollbar except button or resizer */
@@ -38,7 +38,7 @@ h2 {
 /* scrollbar itself */
 ::-webkit-scrollbar-thumb {
   background-color:#202727;
-  border-radius:10px;
+  border-radius:8px;
   border:1px solid rgb(80, 80, 80)
 }
 

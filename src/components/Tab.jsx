@@ -12,6 +12,7 @@ import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordi
  */
 function Tab(props) {
   const [context, setContext] = React.useState({});
+  const [fontSize, setFontSize] = React.useState(12);
 
   React.useEffect(() => {
     // Get the user context from Teams and set it in the state
@@ -27,14 +28,16 @@ function Tab(props) {
     {
       key: 'english',
       content: '[EN] → [JP]',
-      icon: <TranslationIcon />,
-      styles: { backgroundColor: '#33344A', color: '#777786' }
+      icon: <TranslationIcon />
+    },
+    {
+      key: 'divider-1',
+      kind: 'divider'
     },
     {
       key: 'japanese',
       content: '[JP] → [EN]',
-      icon: <TranslationIcon />,
-      styles: { backgroundColor: '#33344A', color: '#777786' }
+      icon: <TranslationIcon />
     },
   ]
 
@@ -44,7 +47,7 @@ function Tab(props) {
         [{
           key: i,
           media: <SpeakerPersonIcon size="medium" />,
-          header: `${userName.split('@')[0]} ${i}`,
+          header: `${userName} ${i}`,
           headerMedia: "7:26:56 AM",
           content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.${i}`,
           endMedia: <EditIcon size="small" />,
@@ -53,7 +56,8 @@ function Tab(props) {
         {
           key: i,
           media: <TranslationIcon size="medium" />,
-          content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.${i}`,
+          content: `
+          Lorem ipsum dolorは、労苦と悲しみ、eiusmodを行うためのいくつかの重要なことを行うために、アメット、consectetur adipiscing elit、sed tempor、vitaryに座っています.`,
         },
         <Divider color="brand" fitted />]
       )
@@ -62,16 +66,25 @@ function Tab(props) {
     return flatMap;
   }
 
-  // const tightDivider = () => (
-  //   <p
-  //     style={{
-  //       padding: '0',
-  //       margin: '0',
-  //     }}
-  //   />
-  // );
+  const handleEvent = () =>{
+    alert('triggered');
+  }
 
-  return (
+  const fontSizeUp = () => {
+    if (fontSize < 24) {
+      let newFontSize = fontSize + 2;
+      setFontSize(newFontSize);
+    }
+  }
+
+  const fontSizeDown = () => {
+    if (fontSize > 3) {
+      let newFontSize = fontSize - 2;
+      setFontSize(newFontSize);
+    }
+  }
+
+  return (context.frameContext === 'sidePanel'?
     <>
       <Flex
         gap="gap.small"
@@ -82,16 +95,22 @@ function Tab(props) {
         <FlexItem
           align='center'
         >
-          <Menu defaultActiveIndex={0} items={items} pointing="start" primary />
+          <Menu defaultActiveIndex={0} items={items} pointing="start" />
         </FlexItem>
       </Flex>
       <Flex
         gap="gap.medium"
-        styles={{ width: '315px', height: '80vh', overflowX: 'hidden', overflowY: 'auto' }}
+        styles={{ width: '315px', height: '78vh', overflowX: 'hidden', overflowY: 'auto' }}
         vAlign='start'
         column={true}
       >
-        <List items={fakeListContents()} />
+        <List 
+          items={fakeListContents()} 
+          truncateHeader={true}
+          variables={{
+            contentFontSize: `${fontSize}px`
+          }}
+        />
       </Flex>
       <Flex
         gap="gap.small"
@@ -99,14 +118,15 @@ function Tab(props) {
         styles={{ backgroundColor: '#33344A' }}
       >
         <FlexItem push>
-          <Button icon={<DownloadIcon />} inverted iconOnly primary styles={{ backgroundColor: '#201F1F' }} />
+          <Button icon={<DownloadIcon />} inverted iconOnly primary styles={{ backgroundColor: '#201F1F' }} onClick={handleEvent}/>
         </FlexItem>
-        <Button circular inverted content="+" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} />
-        <Button circular inverted content="-" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} />
-        <Button icon={<CallRecordingIcon />} inverted content="REC" primary styles={{ backgroundColor: '#C4314B', paddingLeftRightValue: 2 }} />
-        <Button icon={<MicOffIcon />} inverted iconOnly primary styles={{ backgroundColor: '#2A4A51' }} />
+        <Button circular inverted content="+" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeUp}/>
+        <Button circular inverted content="-" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeDown}/>
+        <Button icon={<CallRecordingIcon />} inverted content="REC" primary styles={{ backgroundColor: '#C4314B', paddingLeftRightValue: 2 }} onClick={handleEvent}/>
+        <Button icon={<MicOffIcon />} inverted iconOnly primary styles={{ backgroundColor: '#2A4A51' }} onClick={handleEvent}/>
       </Flex>
     </>
+    : "HoHoHo !!"
   );
 }
 export default Tab;
