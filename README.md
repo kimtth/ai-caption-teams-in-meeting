@@ -28,6 +28,20 @@ Meeting apps will be hosted in the top upper bar of the chat window and as in-me
     ],
 ```
 
+Set permission for initializing microphone, without a permission following message will be displayed.
+
+Error occurred during microphone initialization: NotAllowedError: Permission denied
+
+```json
+	"devicePermissions": [
+		"media"
+	],
+```
+
+- Refer to the structure of manifest.json, Developmet Preview.
+
+    `https://raw.githubusercontent.com/OfficeDev/microsoft-teams-app-schema/preview/DevPreview/MicrosoftTeams.schema.json`
+
 4) Set your `baseUrl0` in `.publish\Development.env` as ngrok URL. In case of following line, it will be `https://d4fcc3cc15d8.ngrok.io`.
 
 ```powershell
@@ -72,6 +86,8 @@ Connections                   ttl     opn     rt1     rt5     p50     p90
 6) Microsoft Administrator Account
 
     Administrator: tataKim@aicaption.onmicrosoft.com
+
+    Teams Admin Site: https://admin.teams.microsoft.com/dashboard
 
 ## Prerequisites
 -  [NodeJS](https://nodejs.org/en/)

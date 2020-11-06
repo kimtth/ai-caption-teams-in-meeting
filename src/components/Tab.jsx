@@ -6,6 +6,9 @@ import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 import { List, Divider, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
 import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon } from '@fluentui/react-icons-northstar'
+//import { Virtuoso } from "react-virtuoso";
+import * as Config from './api/Constants';
+import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
 /**
  * The 'GroupTab' component renders the main tab content
  * of your app.
@@ -13,6 +16,15 @@ import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordi
 function Tab(props) {
   const [context, setContext] = React.useState({});
   const [fontSize, setFontSize] = React.useState(12);
+  const [continualRecDisable, setContinualRecDisable] = React.useState(false);
+  const [recognizer, setRecognizer] = React.useState();
+  const [tabValue, setTabValue] = React.useState(0);
+  /* eslint-disable no-unused-vars */
+  const [primarySpeechlanguage, setPrimarySpeechlanguage] = React.useState(Config.SPEECH_INITIAL_PRIMARY_LANGUAGE);
+  const [primaryTranslatelanguage, setPrimaryTranslatelanguage] = React.useState(Config.TRANSLATE_INITIAL_PRIMARY_LANGUAGE);
+  const [secondarySpeechlanguage, setSecondarySpeechlanguage] = React.useState(Config.SPEECH_INITIAL_SECONDARY_LANGUAGE);
+  const [secondaryTranslatelanguage, setSecondaryTranslatelanguage] = React.useState(Config.TRANSLATE_INITIAL_SECONDARY_LANGUAGE);
+  /* eslint-disable no-unused-vars */
 
   React.useEffect(() => {
     // Get the user context from Teams and set it in the state
@@ -24,11 +36,25 @@ function Tab(props) {
   }, [setContext])
 
   let userName = Object.keys(context).length > 0 ? context['upn'] : "";
+
+  const handleLanguage = (e) => {
+    alert(e.target.id)
+    const id = e.target.id;
+
+    if(id === 'en'){
+      setTabValue(0);
+    } else {
+      setTabValue(1);
+    }
+  }
+
   const items = [
     {
       key: 'english',
+      id: 'en',
       content: '[EN] → [JP]',
-      icon: <TranslationIcon />
+      icon: <TranslationIcon />,
+      onClick: {handleLanguage}
     },
     {
       key: 'divider-1',
@@ -36,8 +62,10 @@ function Tab(props) {
     },
     {
       key: 'japanese',
+      id: 'ja',
       content: '[JP] → [EN]',
-      icon: <TranslationIcon />
+      icon: <TranslationIcon />,
+      onClick: {handleLanguage}
     },
   ]
 
@@ -66,7 +94,7 @@ function Tab(props) {
     return flatMap;
   }
 
-  const handleEvent = () =>{
+  const handleDownloadEvent = () => {
     alert('triggered');
   }
 
@@ -84,7 +112,53 @@ function Tab(props) {
     }
   }
 
-  return (context.frameContext === 'sidePanel'?
+  const errorHandler = () => {
+    setContinualRecDisable(false);
+    StopRecord();
+  }
+
+  const RecordCallback = (lang, result) => {
+    if (secondarySpeechlanguage.includes(lang)) {
+      addTranslateSecondTab(result);
+    } else {
+      addTranslateFirstTab(result);
+    }
+  }
+
+  const addTranslateFirstTab = (bufferString) => {
+    TextTranslator(primaryTranslatelanguage, secondaryTranslatelanguage, bufferString, (translate) => {
+      alert(translate);
+    })
+  }
+
+  const addTranslateSecondTab = (bufferString) => {
+    TextTranslator(secondaryTranslatelanguage, primaryTranslatelanguage, bufferString, (translate) => {
+      alert(translate);
+    })
+  }
+
+  const ContinualRecord = () => {
+    setContinualRecDisable(true);
+
+    let speechLang = primarySpeechlanguage;
+    if (tabValue === 1) {
+      speechLang = secondarySpeechlanguage
+    }
+
+    SpeechToTextContinualStart(speechLang, setRecognizer, (lang, result) => {
+      RecordCallback(lang, result);
+    }, errorHandler);
+  }
+
+  const StopRecord = () => {
+    if (continualRecDisable) {
+      SpeechToTextContinualStop(recognizer, () => {
+        setContinualRecDisable(false);
+      });
+    }
+  }
+
+  return (context.frameContext !== 'sidePanel' ?
     <>
       <Flex
         gap="gap.small"
@@ -104,8 +178,8 @@ function Tab(props) {
         vAlign='start'
         column={true}
       >
-        <List 
-          items={fakeListContents()} 
+        <List
+          items={fakeListContents()}
           truncateHeader={true}
           variables={{
             contentFontSize: `${fontSize}px`
@@ -118,12 +192,12 @@ function Tab(props) {
         styles={{ backgroundColor: '#33344A' }}
       >
         <FlexItem push>
-          <Button icon={<DownloadIcon />} inverted iconOnly primary styles={{ backgroundColor: '#201F1F' }} onClick={handleEvent}/>
+          <Button icon={<DownloadIcon />} inverted iconOnly primary styles={{ backgroundColor: '#201F1F' }} onClick={handleDownloadEvent} />
         </FlexItem>
-        <Button circular inverted content="+" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeUp}/>
-        <Button circular inverted content="-" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeDown}/>
-        <Button icon={<CallRecordingIcon />} inverted content="REC" primary styles={{ backgroundColor: '#C4314B', paddingLeftRightValue: 2 }} onClick={handleEvent}/>
-        <Button icon={<MicOffIcon />} inverted iconOnly primary styles={{ backgroundColor: '#2A4A51' }} onClick={handleEvent}/>
+        <Button circular inverted content="+" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeUp} />
+        <Button circular inverted content="-" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeDown} />
+        <Button icon={<CallRecordingIcon />} inverted content="REC" primary styles={{ backgroundColor: '#C4314B', paddingLeftRightValue: 2 }} disabled={continualRecDisable} onClick={ContinualRecord} />
+        <Button icon={<MicOffIcon />} inverted iconOnly primary styles={{ backgroundColor: '#2A4A51' }} onClick={StopRecord} />
       </Flex>
     </>
     : "HoHoHo !!"

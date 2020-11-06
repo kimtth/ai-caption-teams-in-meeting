@@ -19,7 +19,7 @@ function TabConfig(props) {
      * This allows for the addition of query string parameters based on
      * the settings selected by the user.
      */
-    microsoftTeams.settings.setSettings({"contentUrl": `https://bd7370e6fe1c.ngrok.io/tab`});
+    microsoftTeams.settings.setSettings({"contentUrl": `https://1ec534775c95.ngrok.io/tab`});
 
     /**
      * After verifying that the settings for your tab are correctly

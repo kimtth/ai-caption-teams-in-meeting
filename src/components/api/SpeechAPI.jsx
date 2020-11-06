@@ -1,50 +1,8 @@
 import * as Config from './Constants'
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk"
-import { timeStamp } from '../Util/Util'
+import { timeStamp } from '../util/Util'
 
-export function SpeechToTextOnce(setRecDisable, callback) {
-    let subscriptionKey = Config.SPEECH_SUBSCRIPTION_KEY;
-    let serviceRegion = Config.SPEECH_SERVICE_REGION;
-
-    let speechConfig;
-    if (subscriptionKey.value === "" || subscriptionKey.value === "subscription") {
-        alert("Please enter your Microsoft Cognitive Services Speech subscription key!");
-        return;
-    } else {
-        speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
-    }
-
-    let autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(['ja-JP', 'en-US', 'en-IN', 'en-GB'])
-    let audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
-    //Kim: The order of parameter on official document for configs is wrong. please follow the order written below line.
-    //https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/how-to-automatic-language-detection?pivots=programming-language-javascript
-    let recognizer = SpeechSDK.SpeechRecognizer.FromConfig(speechConfig, autoDetectConfig, audioConfig);
-
-    recognizer.recognizeOnceAsync(
-        (result) => {
-            const languageDetectionResult = SpeechSDK.AutoDetectSourceLanguageResult.fromResult(result);
-            const detectedLanguage = languageDetectionResult.language;
-            console.log(result.text, detectedLanguage);
-
-            if (result.text) {
-                callback(detectedLanguage, result.text);
-            }
-
-            setRecDisable(false);
-            recognizer.close();
-            recognizer = undefined;
-        },
-        (err) => {
-            console.log(err);
-
-            setRecDisable(false);
-            recognizer.close();
-            recognizer = undefined;
-        }
-    );
-}
-
-export function SpeechToTextContinualStart(speechLang, setRecognizer, setRealtimePayLoad, setPauseBufferPayLoad, callback, errorHandler) {
+export function SpeechToTextContinualStart(speechLang, setRecognizer, callback, errorHandler) {
     const subscriptionKey = Config.SPEECH_SUBSCRIPTION_KEY;
     const serviceRegion = Config.SPEECH_SERVICE_REGION;
     console.log(timeStamp() + `:--${serviceRegion}--`);
@@ -76,11 +34,7 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, setRealtim
     );
 
     recognizer.recognizing = function (sender, event) {
-        let result = event.result;
-
-        if (result.text) {
-            setRealtimePayLoad(result.text);
-        }
+        //let result = event.result;
     };
 
     recognizer.recognized = function (sender, event) {
@@ -89,7 +43,6 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, setRealtim
         const detectedLanguage = languageDetectionResult.privLanguage;
 
         if (result.text) {
-            setPauseBufferPayLoad(result.text);
             callback(detectedLanguage, result.text);
         }
     };

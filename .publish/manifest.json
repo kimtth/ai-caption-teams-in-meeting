@@ -1,33 +1,33 @@
 {
     "$schema": "https://raw.githubusercontent.com/OfficeDev/microsoft-teams-app-schema/preview/DevPreview/MicrosoftTeams.schema.json",
     "manifestVersion": "devPreview",
-    "version": "{version}",
+    "version": "1.0.0",
     "id": "aa32a7c1-45d5-455b-8752-882c58aa773c",
     "packageName": "ai-caption.contoso.teams.extension",
     "developer": {
         "name": "skeletonKim",
-        "websiteUrl": "{baseUrl0}",
-        "privacyUrl": "{baseUrl0}/privacy",
-        "termsOfUseUrl": "{baseUrl0}/termsofuse"
+        "websiteUrl": "https://1ec534775c95.ngrok.io",
+        "privacyUrl": "https://1ec534775c95.ngrok.io/privacy",
+        "termsOfUseUrl": "https://1ec534775c95.ngrok.io/termsofuse"
     },
     "icons": {
         "color": "color.png",
         "outline": "outline.png"
     },
     "name": {
-        "short": "{appname}",
-        "full": "{fullappname}"
+        "short": "AI-Caption (TCS)",
+        "full": "AI-Caption (TCS)"
     },
     "description": {
-        "short": "Short description for {appname}.",
-        "full": "Full description of {appname} for Microsoft Teams."
+        "short": "Short description for AI-Caption (TCS).",
+        "full": "Full description of AI-Caption (TCS) for Microsoft Teams."
     },
     "accentColor": "#FFFFFF",
     "bots": [],
     "composeExtensions": [],
     "configurableTabs": [
         {
-            "configurationUrl": "{baseUrl0}/config",
+            "configurationUrl": "https://1ec534775c95.ngrok.io/config",
             "canUpdateConfiguration": true,
             "scopes": [
                 "team",
@@ -36,9 +36,9 @@
             "context":[
                 "channelTab",
                 "privateChatTab",
-                "meetingChatTab",
-                "meetingDetailsTab",
-                "meetingSidePanel"
+				"meetingChatTab",
+				"meetingDetailsTab",
+				"meetingSidePanel"
             ]
         }
     ],
@@ -46,5 +46,12 @@
         "identity",
         "messageTeamMembers"
     ],
+	"devicePermissions": [
+		"media",
+		"geolocation",
+		"notifications",
+		"midi",
+		"openExternal"
+	],
     "validDomains": ["*.ngrok.io"]
 }
