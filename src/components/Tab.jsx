@@ -1,21 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+// Copyright (c) TCS Japan Corporation. All rights reserved.
 
 import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
-import { List, Divider, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
+import { List, ListItem, Divider, Tooltip, Ref, Menu, MenuItem, Flex, FlexItem, Button } from '@fluentui/react-northstar'
 import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon } from '@fluentui/react-icons-northstar'
 //import { Virtuoso } from "react-virtuoso";
 import * as Config from './api/Constants';
+import Conversation from './chat/Conversation';
+import { saveTextArea } from './util/Util'
 import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
-/**
- * The 'GroupTab' component renders the main tab content
- * of your app.
- */
+
 function Tab(props) {
   const [context, setContext] = React.useState({});
-  const [fontSize, setFontSize] = React.useState(12);
+  const [fontSize, setFontSize] = React.useState(14);
   const [continualRecDisable, setContinualRecDisable] = React.useState(false);
   const [recognizer, setRecognizer] = React.useState();
   const [tabValue, setTabValue] = React.useState(0);
@@ -25,81 +23,41 @@ function Tab(props) {
   const [secondarySpeechlanguage, setSecondarySpeechlanguage] = React.useState(Config.SPEECH_INITIAL_SECONDARY_LANGUAGE);
   const [secondaryTranslatelanguage, setSecondaryTranslatelanguage] = React.useState(Config.TRANSLATE_INITIAL_SECONDARY_LANGUAGE);
   /* eslint-disable no-unused-vars */
+  const conversationItem = new Conversation('Welcome to access', 'Hi There!', 'こんにちは。');
+  const [conversationList, setConversationList] = React.useState([conversationItem]);
+  const [userId, setUserId] = React.useState('');
+  const [meetingId, setMeetingId] = React.useState('');
+
+  const [target, setTarget] = React.useState(null)
+  const msg = 'Most of the world seems to have accepted Joe Bidens victory, US presidential election for Donald T ems to have accepted Joe Bidens victory, US presidential election for Donald T'
 
   React.useEffect(() => {
     // Get the user context from Teams and set it in the state
     microsoftTeams.getContext((teamContext, error) => {
       setContext(teamContext);
       //alert(JSON.stringify(teamContext, null, 4));
+      const userId = Object.keys(teamContext).length > 0 ? teamContext['upn'] : "";
+      const meetingId = Object.keys(teamContext).length > 0 ? teamContext['meetingId'] : "";
+      setUserId(userId);
+      setMeetingId(meetingId);
     });
-    // Next steps: Error handling using the error object
-  }, [setContext])
+  }, [])
 
-  let userName = Object.keys(context).length > 0 ? context['upn'] : "";
-
-  const handleLanguage = (e) => {
-    alert(e.target.id)
-    const id = e.target.id;
-
-    if(id === 'en'){
-      setTabValue(0);
-    } else {
-      setTabValue(1);
-    }
+  const handleMode = (mode) => {
+    setTabValue(mode);
   }
 
-  const items = [
-    {
-      key: 'english',
-      id: 'en',
-      content: '[EN] → [JP]',
-      icon: <TranslationIcon />,
-      onClick: {handleLanguage}
-    },
-    {
-      key: 'divider-1',
-      kind: 'divider'
-    },
-    {
-      key: 'japanese',
-      id: 'ja',
-      content: '[JP] → [EN]',
-      icon: <TranslationIcon />,
-      onClick: {handleLanguage}
-    },
-  ]
-
-  const fakeListContents = () => {
-    const contents = Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      i => (
-        [{
-          key: i,
-          media: <SpeakerPersonIcon size="medium" />,
-          header: `${userName} ${i}`,
-          headerMedia: "7:26:56 AM",
-          content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.${i}`,
-          endMedia: <EditIcon size="small" />,
-          style: { marginBottom: '3px' }
-        },
-        {
-          key: i,
-          media: <TranslationIcon size="medium" />,
-          content: `
-          Lorem ipsum dolorは、労苦と悲しみ、eiusmodを行うためのいくつかの重要なことを行うために、アメット、consectetur adipiscing elit、sed tempor、vitaryに座っています.`,
-        },
-        <Divider color="brand" fitted />]
-      )
-    );
-    const flatMap = [].concat.apply([], contents);
-    return flatMap;
+  const handelEdit = () => {
+    alert('edit')
   }
 
   const handleDownloadEvent = () => {
-    alert('triggered');
+    saveTextArea(meetingId, conversationList);
+    alert('Completed');
   }
 
   const fontSizeUp = () => {
-    if (fontSize < 24) {
+    if (fontSize < 30) {
       let newFontSize = fontSize + 2;
       setFontSize(newFontSize);
     }
@@ -125,15 +83,17 @@ function Tab(props) {
     }
   }
 
-  const addTranslateFirstTab = (bufferString) => {
-    TextTranslator(primaryTranslatelanguage, secondaryTranslatelanguage, bufferString, (translate) => {
-      alert(translate);
+  const addTranslateFirstTab = (content) => {
+    TextTranslator(primaryTranslatelanguage, secondaryTranslatelanguage, content, (translate) => {
+      const conversationItem = new Conversation(userId, content, translate);
+      setConversationList(conversationList => [...conversationList, conversationItem])
     })
   }
 
-  const addTranslateSecondTab = (bufferString) => {
-    TextTranslator(secondaryTranslatelanguage, primaryTranslatelanguage, bufferString, (translate) => {
-      alert(translate);
+  const addTranslateSecondTab = (content) => {
+    TextTranslator(secondaryTranslatelanguage, primaryTranslatelanguage, content, (translate) => {
+      const conversationItem = new Conversation(userId, content, translate);
+      setConversationList(conversationList => [...conversationList, conversationItem])
     })
   }
 
@@ -169,7 +129,11 @@ function Tab(props) {
         <FlexItem
           align='center'
         >
-          <Menu defaultActiveIndex={0} items={items} pointing="start" />
+          <Menu defaultActiveIndex={0} activeIndex={tabValue} pointing="start">
+            <MenuItem index={0} key='english' id='en' content='[EN] → [JP]' icon={<TranslationIcon />} onClick={() => handleMode(0)} />
+            <Divider />
+            <MenuItem index={1} key='japanese' id='ja' content='[JP] → [EN]' icon={<TranslationIcon />} onClick={() => handleMode(1)} />
+          </Menu>
         </FlexItem>
       </Flex>
       <Flex
@@ -179,18 +143,34 @@ function Tab(props) {
         column={true}
       >
         <List
-          items={fakeListContents()}
+          items={conversationList}
           truncateHeader={true}
           variables={{
             contentFontSize: `${fontSize}px`
-          }}
-        />
+          }}>
+          {
+            conversationList.map(item => {
+              return [
+                <ListItem
+                  key={item.key} media={<SpeakerPersonIcon size="medium" />}
+                  header={item.userId} headerMedia={item.timestamp} content={item.content}
+                  endMedia={<EditIcon size='small' />}
+                  style={{ marginBottom: '1px' }}
+                  onClick={handelEdit}
+                />,
+                <ListItem key={item.key} media={<TranslationIcon size="medium" />} content={item.translateContent} />,
+                <Divider color="brand" fitted style={{ marginBottom: '2px' }} />
+              ]
+            })
+          }
+        </List>
       </Flex>
       <Flex
         gap="gap.small"
         padding="padding.medium"
-        styles={{ backgroundColor: '#33344A' }}
+        styles={{ width: '315px', backgroundColor: '#33344A' }}
       >
+        <Tooltip trigger={<Button content="." size="small" iconOnly styles={{visibility: 'hidden'}} />} content={msg} open={true}/>
         <FlexItem push>
           <Button icon={<DownloadIcon />} inverted iconOnly primary styles={{ backgroundColor: '#201F1F' }} onClick={handleDownloadEvent} />
         </FlexItem>

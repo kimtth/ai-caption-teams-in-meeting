@@ -28,9 +28,9 @@ Meeting apps will be hosted in the top upper bar of the chat window and as in-me
     ],
 ```
 
-Set permission for initializing microphone, without a permission following message will be displayed.
+    Set permission for initializing microphone, without a permission following message will be displayed.
 
-Error occurred during microphone initialization: NotAllowedError: Permission denied
+    Error occurred during microphone initialization: NotAllowedError: Permission denied
 
 ```json
 	"devicePermissions": [
@@ -41,6 +41,12 @@ Error occurred during microphone initialization: NotAllowedError: Permission den
 - Refer to the structure of manifest.json, Developmet Preview.
 
     `https://raw.githubusercontent.com/OfficeDev/microsoft-teams-app-schema/preview/DevPreview/MicrosoftTeams.schema.json`
+
+- Grant permission to install a custom app to your account
+
+    `https://docs.microsoft.com/en-us/microsoftteams/platform/resources/dev-preview/developer-preview-intro#enable-developer-preview`
+
+    `https://docs.microsoft.com/en-us/microsoftteams/platform/resources/dev-preview/developer-preview-intro#enable-developer-preview`
 
 4) Set your `baseUrl0` in `.publish\Development.env` as ngrok URL. In case of following line, it will be `https://d4fcc3cc15d8.ngrok.io`.
 

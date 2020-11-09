@@ -11,12 +11,10 @@ export const APPLICATION_ID = '8f92afc0-55a3-41b6-826b-03636cec0330'
 export const TENANT_ID = '2d1ca593-e23f-4d06-a6df-9ca474f47838'
 
 //dev
-//export const APPLICATION_ID = '60f115d5-9cc2-4204-b638-f405b5833721'
-//export const TENANT_ID = '1c53016c-bf0c-4745-baa4-60aeb2bc19d9'
+export const CONTENT_URL = 'https://d45b88304003.ngrok.io'
 
 //Application
-export const TITLE_SAVE_ONE = '[Speech-to-Translate #1] \r\n'//'1.[English -> 日本語] \r\n'
-export const TITLE_SAVE_TWO = '[Speech-to-Translate #2] \r\n'//'2.[日本語 -> English] \r\n'
+export const TITLE_SAVE_ONE = '[議事録_Minutes] \r\n'//'1.[English -> 日本語] \r\n'
 export const TITLE_BACKTRACK = '[Shadow Tracking] \r\n'
 export const SAVE_FILE_NAME = 'voice-text-save-'
 export const SAVE_FILE_EXTENSION = '.txt'

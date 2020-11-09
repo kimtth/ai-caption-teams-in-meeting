@@ -14,37 +14,19 @@ export const timeStamp = function(){
     return timestamp
   }
 
-// export const saveTextArea = (channelId, firstTabSrcValues, secondTabSrcValues) =>{
-//     let save_data = Config.TITLE_SAVE_ONE;
-//     //Kim: Add userId in text
-//     firstTabSrcValues.map((item) => {
-//         save_data += `${item.timestamp} ${item.conversationText} <${item.userId}>`;
-//         save_data += '\r\n';
-//         save_data += `${item.timestamp} ${item.translateText} <${item.userId}>`;
-//         save_data += '\r\n';
-//         return save_data;
-//     })
-    
-//     save_data += '\r\n';
-//     save_data += Config.TITLE_SAVE_TWO;
-//     secondTabSrcValues.map((item) => {
-//         save_data += `${item.timestamp} ${item.conversationText} <${item.userId}>`;
-//         save_data += '\r\n';
-//         save_data += `${item.timestamp} ${item.translateText} <${item.userId}>`;
-//         save_data += '\r\n';
-//         return save_data;
-//     })
+export const saveTextArea = (channelId, conversationList) =>{
+    let save_data = Config.TITLE_SAVE_ONE;
+    //Kim: Add userId in text
+    conversationList.map((item) => {
+        save_data += `${item.timestamp} ${item.content} <${item.userId}>`;
+        save_data += '\r\n';
+        save_data += `${item.timestamp} ${item.translateContent} <${item.userId}>`;
+        save_data += '\r\n';
+        return save_data;
+    })
 
-//     save_data += '\r\n';
-//     save_data += Config.TITLE_BACKTRACK;
-//     getBackTrackConversation(channelId).map((item) => {
-//         save_data += `${item.timestamp} ${item.conversationText} <${item.userId}>`;
-//         save_data += '\r\n';
-//         return save_data;
-//     })
-
-//     SaveRecordToFile(save_data, Config.SAVE_FILE_NAME);
-// }
+    SaveRecordToFile(save_data, Config.SAVE_FILE_NAME);
+}
 
 export const SaveRecordToFile = (save_data, save_file_name) => {
     const timestampNow = Date().now;
