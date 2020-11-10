@@ -3,7 +3,7 @@
 import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
-import { List, ListItem, Divider, Tooltip, Ref, Menu, MenuItem, Flex, FlexItem, Button } from '@fluentui/react-northstar'
+import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, MenuItem, Flex, FlexItem, Button } from '@fluentui/react-northstar'
 import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon } from '@fluentui/react-icons-northstar'
 //import { Virtuoso } from "react-virtuoso";
 import * as Config from './api/Constants';
@@ -28,8 +28,12 @@ function Tab(props) {
   const [userId, setUserId] = React.useState('');
   const [meetingId, setMeetingId] = React.useState('');
 
-  const [target, setTarget] = React.useState(null)
-  const msg = 'Most of the world seems to have accepted Joe Bidens victory, US presidential election for Donald T ems to have accepted Joe Bidens victory, US presidential election for Donald T'
+  const [tooltipContent, setTooltipContent] = React.useState('');
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState('');
+  const [noticeOpen, setNoticeOpen] = React.useState(false);
+  const messagesEndRef = React.useRef(null);
 
   React.useEffect(() => {
     // Get the user context from Teams and set it in the state
@@ -43,17 +47,35 @@ function Tab(props) {
     });
   }, [])
 
+  React.useEffect(() => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [conversationList])
+
   const handleMode = (mode) => {
     setTabValue(mode);
   }
 
-  const handelEdit = () => {
-    alert('edit')
+  const handelEdit = (key, content) => {
+    setDialogContent(content);
+    setDialogOpen(true);
+  }
+
+  const onDialogCancel = () => {
+    setDialogOpen(false);
+    setNoticeOpen(false);
+  }
+
+  const onDialogConfirm= () => {
+    setDialogOpen(false);
+  }
+
+  const onChangeTextArea= (e) => {
+    setDialogContent(e.target.value);
   }
 
   const handleDownloadEvent = () => {
     saveTextArea(meetingId, conversationList);
-    alert('Completed');
+    setNoticeOpen(true);
   }
 
   const fontSizeUp = () => {
@@ -87,28 +109,35 @@ function Tab(props) {
     TextTranslator(primaryTranslatelanguage, secondaryTranslatelanguage, content, (translate) => {
       const conversationItem = new Conversation(userId, content, translate);
       setConversationList(conversationList => [...conversationList, conversationItem])
+      setTooltipOpen(false);
     })
   }
 
   const addTranslateSecondTab = (content) => {
     TextTranslator(secondaryTranslatelanguage, primaryTranslatelanguage, content, (translate) => {
       const conversationItem = new Conversation(userId, content, translate);
-      setConversationList(conversationList => [...conversationList, conversationItem])
+      setConversationList(conversationList => [...conversationList, conversationItem]);
+      setTooltipOpen(false);
     })
+  }
+
+  const realtimeTooltip = (content) => {
+    setTooltipOpen(true);
+    setTooltipContent(content);
   }
 
   const ContinualRecord = () => {
     setContinualRecDisable(true);
-
     let speechLang = primarySpeechlanguage;
     if (tabValue === 1) {
       speechLang = secondarySpeechlanguage
     }
 
-    SpeechToTextContinualStart(speechLang, setRecognizer, (lang, result) => {
+    SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTooltip, (lang, result) => {
       RecordCallback(lang, result);
     }, errorHandler);
   }
+
 
   const StopRecord = () => {
     if (continualRecDisable) {
@@ -120,6 +149,26 @@ function Tab(props) {
 
   return (context.frameContext !== 'sidePanel' ?
     <>
+      <Dialog
+        open={noticeOpen}
+        confirmButton="Confirm"
+        onConfirm={onDialogCancel}
+        content={'Download Completed.'}
+      />
+      <Dialog
+        open={dialogOpen}
+        cancelButton="Cancel"
+        confirmButton="Confirm"
+        onCancel={onDialogCancel}
+        onConfirm={onDialogConfirm}
+        content={<TextArea 
+          placeholder="Type here..." 
+          onChange={onChangeTextArea} 
+          value={dialogContent} 
+          styles={{ width: '98%', height: '150px' }}/>}
+        header="Please edit here."
+        closeOnOutsideClick={false}
+      />
       <Flex
         gap="gap.small"
         styles={{ width: '315px' }}
@@ -129,7 +178,7 @@ function Tab(props) {
         <FlexItem
           align='center'
         >
-          <Menu defaultActiveIndex={0} activeIndex={tabValue} pointing="start">
+          <Menu defaultActiveIndex={0} activeIndex={tabValue} pointing="end">
             <MenuItem index={0} key='english' id='en' content='[EN] → [JP]' icon={<TranslationIcon />} onClick={() => handleMode(0)} />
             <Divider />
             <MenuItem index={1} key='japanese' id='ja' content='[JP] → [EN]' icon={<TranslationIcon />} onClick={() => handleMode(1)} />
@@ -154,12 +203,13 @@ function Tab(props) {
                 <ListItem
                   key={item.key} media={<SpeakerPersonIcon size="medium" />}
                   header={item.userId} headerMedia={item.timestamp} content={item.content}
-                  endMedia={<EditIcon size='small' />}
+                  endMedia={<EditIcon size='small' onClick={() => handelEdit(item.key, item.content)} />}
                   style={{ marginBottom: '1px' }}
-                  onClick={handelEdit}
+
                 />,
                 <ListItem key={item.key} media={<TranslationIcon size="medium" />} content={item.translateContent} />,
-                <Divider color="brand" fitted style={{ marginBottom: '2px' }} />
+                <Divider color="brand" fitted style={{ marginBottom: '2px' }} />,
+                <div ref={messagesEndRef}></div>
               ]
             })
           }
@@ -170,10 +220,10 @@ function Tab(props) {
         padding="padding.medium"
         styles={{ width: '315px', backgroundColor: '#33344A' }}
       >
-        <Tooltip trigger={<Button content="." size="small" iconOnly styles={{visibility: 'hidden'}} />} content={msg} open={true}/>
         <FlexItem push>
           <Button icon={<DownloadIcon />} inverted iconOnly primary styles={{ backgroundColor: '#201F1F' }} onClick={handleDownloadEvent} />
         </FlexItem>
+        <Tooltip trigger={<Button content="." size="small" iconOnly styles={{ visibility: 'hidden' }} />} content={tooltipContent} open={tooltipOpen} />
         <Button circular inverted content="+" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeUp} />
         <Button circular inverted content="-" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeDown} />
         <Button icon={<CallRecordingIcon />} inverted content="REC" primary styles={{ backgroundColor: '#C4314B', paddingLeftRightValue: 2 }} disabled={continualRecDisable} onClick={ContinualRecord} />

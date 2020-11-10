@@ -2,7 +2,7 @@ import * as Config from './Constants'
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk"
 import { timeStamp } from '../util/Util'
 
-export function SpeechToTextContinualStart(speechLang, setRecognizer, callback, errorHandler) {
+export function SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTooltip, callback, errorHandler) {
     const subscriptionKey = Config.SPEECH_SUBSCRIPTION_KEY;
     const serviceRegion = Config.SPEECH_SERVICE_REGION;
     console.log(timeStamp() + `:--${serviceRegion}--`);
@@ -34,7 +34,11 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, callback, 
     );
 
     recognizer.recognizing = function (sender, event) {
-        //let result = event.result;
+        let result = event.result;
+
+        if (result.text) {
+            realtimeTooltip(result.text);
+        }
     };
 
     recognizer.recognized = function (sender, event) {
@@ -48,7 +52,7 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, callback, 
     };
 
     recognizer.canceled = (s, e) => {
-        alert(e.reason);
+        console.log(e.reason);
         SpeechToTextContinualStopWithoutCallback(recognizer);
     }
 }
@@ -101,10 +105,10 @@ export function TextTranslator(from, to, text, callback) {
         .then((data) => {
             //Kim: Optional Chaining for null check. var data = [{translations: [{text:"Saab"}, "Volvo"]}, "BMW"];
             if (data?.length) {
-                if(data[0].translations?.length){
+                if (data[0].translations?.length) {
                     let rtn = data[0].translations[0];
                     const text = rtn?.text;
-                    if(text)
+                    if (text)
                         callback(text);
                 }
             }

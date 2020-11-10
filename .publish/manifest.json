@@ -6,9 +6,9 @@
    "packageName":"ai-caption.contoso.teams.extension",
    "developer":{
       "name":"skeletonKim",
-      "websiteUrl":"https://d45b88304003.ngrok.io",
-      "privacyUrl":"https://d45b88304003.ngrok.io/privacy",
-      "termsOfUseUrl":"https://d45b88304003.ngrok.io/termsofuse"
+      "websiteUrl":"https://e93e386c2946.ngrok.io",
+      "privacyUrl":"https://e93e386c2946.ngrok.io/privacy",
+      "termsOfUseUrl":"https://e93e386c2946.ngrok.io/termsofuse"
    },
    "icons":{
       "color":"color.png",
@@ -31,7 +31,7 @@
    ],
    "configurableTabs":[
       {
-         "configurationUrl":"https://d45b88304003.ngrok.io/config",
+         "configurationUrl":"https://e93e386c2946.ngrok.io/config",
          "canUpdateConfiguration":true,
          "scopes":[
             "team",
