@@ -28,9 +28,9 @@ Meeting apps will be hosted in the top upper bar of the chat window and as in-me
     ],
 ```
 
-    Set permission for initializing microphone, without a permission following message will be displayed.
+- Set permission for initializing microphone, without a permission following message will be displayed.
 
-    Error occurred during microphone initialization: NotAllowedError: Permission denied
+    `Error occurred during microphone initialization: NotAllowedError: Permission denied`
 
 ```json
 	"devicePermissions": [
@@ -44,11 +44,11 @@ Meeting apps will be hosted in the top upper bar of the chat window and as in-me
 
 - Grant permission to install a custom app to your account
 
-    `https://docs.microsoft.com/en-us/microsoftteams/platform/resources/dev-preview/developer-preview-intro#enable-developer-preview`
+    `https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/prepare-your-o365-tenant`
 
     `https://docs.microsoft.com/en-us/microsoftteams/platform/resources/dev-preview/developer-preview-intro#enable-developer-preview`
 
-4) Set your `baseUrl0` in `.publish\Development.env` as ngrok URL. In case of following line, it will be `https://d4fcc3cc15d8.ngrok.io`.
+4) Set your in `.publish\manifest.json` as ngrok URL. In case of following line, it will be `https://d4fcc3cc15d8.ngrok.io`.
 
 ```powershell
 ngrok by @inconshreveable                                                                               (Ctrl+C to quit)
@@ -66,6 +66,8 @@ Connections                   ttl     opn     rt1     rt5     p50     p90
 ```
 
 5) TeamContext Sample
+
+The upn attribute is deprecated. Instead of upn, use loginHint attribute.
 
 ```json
 {

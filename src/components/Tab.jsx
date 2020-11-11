@@ -5,7 +5,6 @@ import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, MenuItem, Flex, FlexItem, Button } from '@fluentui/react-northstar'
 import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon } from '@fluentui/react-icons-northstar'
-//import { Virtuoso } from "react-virtuoso";
 import * as Config from './api/Constants';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
@@ -31,6 +30,7 @@ function Tab(props) {
   const [tooltipContent, setTooltipContent] = React.useState('');
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogKey, setDialogKey] = React.useState('');
   const [dialogContent, setDialogContent] = React.useState('');
   const [noticeOpen, setNoticeOpen] = React.useState(false);
   const messagesEndRef = React.useRef(null);
@@ -40,7 +40,7 @@ function Tab(props) {
     microsoftTeams.getContext((teamContext, error) => {
       setContext(teamContext);
       //alert(JSON.stringify(teamContext, null, 4));
-      const userId = Object.keys(teamContext).length > 0 ? teamContext['upn'] : "";
+      const userId = Object.keys(teamContext).length > 0 ? teamContext['loginHint'] : "";
       const meetingId = Object.keys(teamContext).length > 0 ? teamContext['meetingId'] : "";
       setUserId(userId);
       setMeetingId(meetingId);
@@ -48,7 +48,8 @@ function Tab(props) {
   }, [])
 
   React.useEffect(() => {
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current)
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [conversationList])
 
   const handleMode = (mode) => {
@@ -56,6 +57,7 @@ function Tab(props) {
   }
 
   const handelEdit = (key, content) => {
+    setDialogKey(key);
     setDialogContent(content);
     setDialogOpen(true);
   }
@@ -65,12 +67,39 @@ function Tab(props) {
     setNoticeOpen(false);
   }
 
-  const onDialogConfirm= () => {
-    setDialogOpen(false);
+  const onDialogConfirm = () => {
+    const index = indexOfItem(conversationList, dialogKey);
+    if (index === -1) {
+      console.log('The index of item is not found');
+      return;
+    }
+    const conversationItem = conversationList[index];
+
+    let srcLanguage = primaryTranslatelanguage;
+    let targetLanguage = secondaryTranslatelanguage;
+    if(tabValue === 1){
+      srcLanguage = secondaryTranslatelanguage;
+      targetLanguage = primaryTranslatelanguage;
+    }
+
+    TextTranslator(srcLanguage, targetLanguage, dialogContent, (translate) => {
+      conversationItem.content = dialogContent;
+      conversationItem.translateContent = translate;
+      conversationList[index] = conversationItem;
+      setConversationList(conversationList);
+      setDialogOpen(false);
+    })
   }
 
-  const onChangeTextArea= (e) => {
+  const onChangeTextArea = (e) => {
     setDialogContent(e.target.value);
+  }
+
+  const indexOfItem = function (target, value) {
+    const index = target.map(function (e) {
+      return e.key;
+    }).indexOf(value);
+    return index;
   }
 
   const handleDownloadEvent = () => {
@@ -161,11 +190,11 @@ function Tab(props) {
         confirmButton="Confirm"
         onCancel={onDialogCancel}
         onConfirm={onDialogConfirm}
-        content={<TextArea 
-          placeholder="Type here..." 
-          onChange={onChangeTextArea} 
-          value={dialogContent} 
-          styles={{ width: '98%', height: '150px' }}/>}
+        content={<TextArea
+          placeholder="Type here..."
+          onChange={onChangeTextArea}
+          value={dialogContent}
+          styles={{ width: '98%', height: '150px' }} />}
         header="Please edit here."
         closeOnOutsideClick={false}
       />
@@ -207,7 +236,7 @@ function Tab(props) {
                   style={{ marginBottom: '1px' }}
 
                 />,
-                <ListItem key={item.key} media={<TranslationIcon size="medium" />} content={item.translateContent} />,
+                <ListItem key={`a${item.key}`} media={<TranslationIcon size="medium" />} content={item.translateContent} />,
                 <Divider color="brand" fitted style={{ marginBottom: '2px' }} />,
                 <div ref={messagesEndRef}></div>
               ]

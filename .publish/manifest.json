@@ -1,14 +1,21 @@
 {
-   "$schema":"https://raw.githubusercontent.com/OfficeDev/microsoft-teams-app-schema/preview/DevPreview/MicrosoftTeams.schema.json",
-   "manifestVersion":"devPreview",
+   "$schema": "https://raw.githubusercontent.com/OfficeDev/microsoft-teams-app-schema/preview/DevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
    "version":"1.0.0",
    "id":"aa32a7c1-45d5-455b-8752-882c58aa773c",
    "packageName":"ai-caption.contoso.teams.extension",
+   "devicePermissions":[
+      "media",
+      "geolocation",
+      "notifications",
+      "midi",
+      "openExternal"
+   ],
    "developer":{
       "name":"skeletonKim",
-      "websiteUrl":"https://e93e386c2946.ngrok.io",
-      "privacyUrl":"https://e93e386c2946.ngrok.io/privacy",
-      "termsOfUseUrl":"https://e93e386c2946.ngrok.io/termsofuse"
+      "websiteUrl":"https://924811114bbc.ngrok.io",
+      "privacyUrl":"https://924811114bbc.ngrok.io/privacy",
+      "termsOfUseUrl":"https://924811114bbc.ngrok.io/termsofuse"
    },
    "icons":{
       "color":"color.png",
@@ -31,7 +38,7 @@
    ],
    "configurableTabs":[
       {
-         "configurationUrl":"https://e93e386c2946.ngrok.io/config",
+         "configurationUrl":"https://924811114bbc.ngrok.io/config",
          "canUpdateConfiguration":true,
          "scopes":[
             "team",
@@ -42,7 +49,7 @@
             "privateChatTab",
             "meetingChatTab",
             "meetingDetailsTab",
-            "meetingSidePanel"
+			"meetingSidePanel"
          ]
       }
    ],
@@ -50,15 +57,7 @@
       "identity",
       "messageTeamMembers"
    ],
-   "devicePermissions":[
-      "media",
-      "geolocation",
-      "notifications",
-      "midi",
-      "openExternal"
-   ],
    "validDomains":[
-      "*.ngrok.io",
-	  "d45b88304003.ngrok.io"
+      "*.ngrok.io"
    ]
 }
