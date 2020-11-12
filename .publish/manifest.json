@@ -13,9 +13,9 @@
    ],
    "developer":{
       "name":"skeletonKim",
-      "websiteUrl":"https://924811114bbc.ngrok.io",
-      "privacyUrl":"https://924811114bbc.ngrok.io/privacy",
-      "termsOfUseUrl":"https://924811114bbc.ngrok.io/termsofuse"
+      "websiteUrl":"https://5397a1cbc1f6.ngrok.io",
+      "privacyUrl":"https://5397a1cbc1f6.ngrok.io/privacy",
+      "termsOfUseUrl":"https://5397a1cbc1f6.ngrok.io/termsofuse"
    },
    "icons":{
       "color":"color.png",
@@ -38,7 +38,7 @@
    ],
    "configurableTabs":[
       {
-         "configurationUrl":"https://924811114bbc.ngrok.io/config",
+         "configurationUrl":"https://5397a1cbc1f6.ngrok.io/config",
          "canUpdateConfiguration":true,
          "scopes":[
             "team",

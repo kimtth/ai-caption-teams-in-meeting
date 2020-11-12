@@ -11,10 +11,10 @@ export const APPLICATION_ID = '8f92afc0-55a3-41b6-826b-03636cec0330'
 export const TENANT_ID = '2d1ca593-e23f-4d06-a6df-9ca474f47838'
 
 //dev
-export const CONTENT_URL = 'https://924811114bbc.ngrok.io'
+export const CONTENT_URL = 'https://5397a1cbc1f6.ngrok.io'
 
 //Application
-export const TITLE_SAVE_ONE = '[議事録_Minutes] \r\n'//'1.[English -> 日本語] \r\n'
+export const TITLE_SAVE_ONE = '<議事録(Minutes)> \r\n'//'1.[English -> 日本語] \r\n'
 export const TITLE_BACKTRACK = '[Shadow Tracking] \r\n'
 export const SAVE_FILE_NAME = 'voice-text-save-'
 export const SAVE_FILE_EXTENSION = '.txt'
@@ -24,9 +24,6 @@ export const SPEECH_INITIAL_SECONDARY_LANGUAGE = ['ja-JP']
 export const TRANSLATE_INITIAL_PRIMARY_LANGUAGE = 'en'
 export const TRANSLATE_INITIAL_SECONDARY_LANGUAGE  = 'ja'
 
-export const MAIN_CH = 'main'
-export const WARNING_INTERRUPT = 'The recording will be terminated for your interruption.'
-export const WARNING_DELETED = 'The channel was deleted by owner. please remove this channel.'
 export const WARNING_NOT_EDITABLE = 'Welcome Message is not editable.'
 export const NOTICE_SHARE = 'Please share the channel ID for a subscriber.'
 export const REFRESH_MSG = 'Your network could have disconnected for a while. The browser should be refreshed (F5).'

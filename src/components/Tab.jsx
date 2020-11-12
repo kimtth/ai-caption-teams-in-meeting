@@ -4,7 +4,7 @@ import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, MenuItem, Flex, FlexItem, Button } from '@fluentui/react-northstar'
-import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon } from '@fluentui/react-icons-northstar'
+import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon, RetryIcon } from '@fluentui/react-icons-northstar'
 import * as Config from './api/Constants';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
@@ -15,7 +15,7 @@ function Tab(props) {
   const [fontSize, setFontSize] = React.useState(14);
   const [continualRecDisable, setContinualRecDisable] = React.useState(false);
   const [recognizer, setRecognizer] = React.useState();
-  const [tabValue, setTabValue] = React.useState(0);
+
   /* eslint-disable no-unused-vars */
   const [primarySpeechlanguage, setPrimarySpeechlanguage] = React.useState(Config.SPEECH_INITIAL_PRIMARY_LANGUAGE);
   const [primaryTranslatelanguage, setPrimaryTranslatelanguage] = React.useState(Config.TRANSLATE_INITIAL_PRIMARY_LANGUAGE);
@@ -34,6 +34,8 @@ function Tab(props) {
   const [dialogContent, setDialogContent] = React.useState('');
   const [noticeOpen, setNoticeOpen] = React.useState(false);
   const messagesEndRef = React.useRef(null);
+
+  const [tabValue, setTabValue] = React.useState(0);
 
   React.useEffect(() => {
     // Get the user context from Teams and set it in the state
@@ -77,7 +79,7 @@ function Tab(props) {
 
     let srcLanguage = primaryTranslatelanguage;
     let targetLanguage = secondaryTranslatelanguage;
-    if(tabValue === 1){
+    if (tabValue === 1) {
       srcLanguage = secondaryTranslatelanguage;
       targetLanguage = primaryTranslatelanguage;
     }
@@ -176,6 +178,11 @@ function Tab(props) {
     }
   }
 
+  const handleRetry = () => {
+    console.log('reload');
+    window.location.reload();
+  }
+
   return (context.frameContext !== 'sidePanel' ?
     <>
       <Dialog
@@ -204,15 +211,19 @@ function Tab(props) {
         padding="padding.medium"
         column={true}
       >
-        <FlexItem
-          align='center'
-        >
-          <Menu defaultActiveIndex={0} activeIndex={tabValue} pointing="end">
-            <MenuItem index={0} key='english' id='en' content='[EN] → [JP]' icon={<TranslationIcon />} onClick={() => handleMode(0)} />
-            <Divider />
-            <MenuItem index={1} key='japanese' id='ja' content='[JP] → [EN]' icon={<TranslationIcon />} onClick={() => handleMode(1)} />
-          </Menu>
-        </FlexItem>
+        {
+          /* 
+          activeIndex={tabValue} 
+          Kim: Warning: Cannot update a component MenuItem while rendering a different component ContextSelector.Provider
+          https://github.com/microsoft/fluentui/issues/13684 
+          */
+        }
+        <Menu defaultActiveIndex={0} activeIndex={tabValue} pointing="end">
+          <Menu.Item index={0} key='english' id='en' content='[EN] → [JP]' icon={<TranslationIcon />} onClick={() => handleMode(0)} />
+          <Divider />
+          <Menu.Item index={1} key='japanese' id='ja' content='[JP] → [EN]' icon={<TranslationIcon />} onClick={() => handleMode(1)} />
+          <Menu.Item key='retry' id='retry' iconOnly icon={<RetryIcon />} onClick={() => handleRetry()} />
+        </Menu>
       </Flex>
       <Flex
         gap="gap.medium"
@@ -220,12 +231,7 @@ function Tab(props) {
         vAlign='start'
         column={true}
       >
-        <List
-          items={conversationList}
-          truncateHeader={true}
-          variables={{
-            contentFontSize: `${fontSize}px`
-          }}>
+        <List truncateHeader={true}>
           {
             conversationList.map(item => {
               return [
@@ -233,12 +239,18 @@ function Tab(props) {
                   key={item.key} media={<SpeakerPersonIcon size="medium" />}
                   header={item.userId} headerMedia={item.timestamp} content={item.content}
                   endMedia={<EditIcon size='small' onClick={() => handelEdit(item.key, item.content)} />}
-                  style={{ marginBottom: '1px' }}
-
+                  style={{ marginBottom: '2px' }}
+                  variables={{
+                    contentFontSize: `${fontSize}px`
+                  }}
                 />,
-                <ListItem key={`a${item.key}`} media={<TranslationIcon size="medium" />} content={item.translateContent} />,
-                <Divider color="brand" fitted style={{ marginBottom: '2px' }} />,
-                <div ref={messagesEndRef}></div>
+                <ListItem key={`a${item.key}`} media={<TranslationIcon size="medium" />}
+                  content={item.translateContent}
+                  variables={{
+                    contentFontSize: `${fontSize}px`
+                  }} />,
+                <Divider key={`b${item.key}`} color="brand" fitted style={{ marginBottom: '2px' }} />,
+                <div key={`c${item.key}`} ref={messagesEndRef}></div>
               ]
             })
           }

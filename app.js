@@ -1,0 +1,87 @@
+const Koa = require('koa');
+const Router = require('koa-router');
+const BodyParser = require("koa-bodyparser");
+const serve = require('koa-static');
+const mount = require("koa-mount");
+const session = require('koa-session');
+const mongoose = require('mongoose');
+const cors = require('@koa/cors');
+const api = require('./core');
+const passport = require('koa-passport')
+
+//Kim: Switch between multiple .env files.
+require('dotenv').config()
+const env = process.env.NODE_ENV;
+if (env !== "production") {
+    require('dotenv').config({ path: "./.env.dev" })
+}
+
+const { socketJS } = require('./core/chat');
+
+const corsOptionsDev = {
+    origin: 'http://localhost:3000',
+    credentials: true
+};
+const app = new Koa();
+if (process.env.NODE_ENV !== 'production') {
+    app.use(cors(corsOptionsDev));
+} else {
+    app.use(cors());
+}
+
+//Kim: authentication
+app.keys = [process.env.CRYPT_KEY];
+app.use(session({}, app))
+
+app.use(BodyParser()); //Kim: Bodyparser should be set before router.
+
+//Kim: authentication
+require('./core/user-auth')
+app.use(passport.initialize())
+app.use(passport.session())
+
+const static_pages = new Koa();
+static_pages.use(serve(__dirname + "/build")); //serve the build directory
+app.use(mount("/", static_pages));
+
+const router = new Router();
+router.use('/api', api.routes());
+app.use(router.routes()).use(router.allowedMethods());
+
+//Kim: for handling 404 error
+app.use(async (ctx, next) => {
+    if (ctx.status === 404) {
+        ctx.status = 404
+        let bodyContents = `<html><body style="background-color:#c3c4ff; padding:100px">`
+        bodyContents += `<h2 style="color:black;text-align:center">You are currently in fallback (404).`
+        bodyContents += `<br/> Please go back to main page.</h2></body></html>`
+        ctx.body = bodyContents;
+    }
+})
+
+console.log('>>>>', process.env.NODE_ENV)
+let mongoUri = process.env.MONGO_ENDPOINT
+let port = 80
+if (process.env.NODE_ENV !== 'production') { //development
+    port = 8080;
+}
+
+//Kim: socket server
+const server = require('http').createServer(app.callback())
+socketJS(server);
+
+let dbName = process.env.DB_NAME;
+server.listen(port, () => {
+    console.log(`Listening on (Web/Socket) ${port}`)
+    //Kim: useCreateIndex: true: Prevent DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
+    //Kim: DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated.
+    mongoose.connect(mongoUri, { useCreateIndex: true, dbName: dbName, useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true })
+        .then(() => {
+            console.log('Connected to MongoDB')
+        })
+        .catch(e => {
+            console.log(e);
+        })
+})
+
+
