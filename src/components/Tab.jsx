@@ -9,6 +9,8 @@ import * as Config from './api/Constants';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
 import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
+import { writeMessage, listMessages, updateMessage, updateTranslateMessage } from './chat/InvokeAPI'
+
 
 function Tab(props) {
   const [context, setContext] = React.useState({});
@@ -41,11 +43,12 @@ function Tab(props) {
     // Get the user context from Teams and set it in the state
     microsoftTeams.getContext((teamContext, error) => {
       setContext(teamContext);
-      //alert(JSON.stringify(teamContext, null, 4));
+      // alert(JSON.stringify(teamContext, null, 4));
       const userId = Object.keys(teamContext).length > 0 ? teamContext['loginHint'] : "";
-      const meetingId = Object.keys(teamContext).length > 0 ? teamContext['meetingId'] : "";
+      const meetingId = (teamContext['meetingId'] == null || teamContext['meetingId'].length === 0) ? teamContext['channelId'] : teamContext['meetingId'];
       setUserId(userId);
       setMeetingId(meetingId);
+      initializeConversation(userId, meetingId);
     });
   }, [])
 
@@ -54,11 +57,22 @@ function Tab(props) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [conversationList])
 
+  const initializeConversation = (userId, channelId) => {
+    listMessages({ channelId: channelId, userId: userId })
+      .then(resp => {
+        const conversations = resp.data;
+        setConversationList(conversations);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+  }
+
   const handleMode = (mode) => {
     setTabValue(mode);
   }
 
-  const handelEdit = (key, content) => {
+  const handelMessageEdit = (key, content) => {
     setDialogKey(key);
     setDialogContent(content);
     setDialogOpen(true);
@@ -69,7 +83,7 @@ function Tab(props) {
     setNoticeOpen(false);
   }
 
-  const onDialogConfirm = () => {
+  const onDialogUpdateMessageConfirm = () => {
     const index = indexOfItem(conversationList, dialogKey);
     if (index === -1) {
       console.log('The index of item is not found');
@@ -85,11 +99,24 @@ function Tab(props) {
     }
 
     TextTranslator(srcLanguage, targetLanguage, dialogContent, (translate) => {
-      conversationItem.content = dialogContent;
-      conversationItem.translateContent = translate;
-      conversationList[index] = conversationItem;
-      setConversationList(conversationList);
-      setDialogOpen(false);
+      updateMessage({ id: dialogKey, content: dialogContent })
+        .then(function (response) {
+          updateTranslateMessage({ id: dialogKey, translateContent: translate })
+            .then(function (response) {
+              conversationItem.content = dialogContent;
+              conversationItem.translateContent = translate;
+              conversationList[index] = conversationItem;
+
+              setConversationList(conversationList);
+              setDialogOpen(false);
+            })
+            .catch(function (error) {
+              console.log(error);
+            })
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
     })
   }
 
@@ -128,30 +155,25 @@ function Tab(props) {
     StopRecord();
   }
 
-  const RecordCallback = (lang, result) => {
-    if (secondarySpeechlanguage.includes(lang)) {
-      addTranslateSecondTab(result);
-    } else {
-      addTranslateFirstTab(result);
-    }
-  }
+  const RecordCallback = (lang, content) => {
+    let srcLang = primaryTranslatelanguage;
+    let targetLang = secondaryTranslatelanguage;
 
-  const addTranslateFirstTab = (content) => {
-    TextTranslator(primaryTranslatelanguage, secondaryTranslatelanguage, content, (translate) => {
-      const conversationItem = new Conversation(userId, content, translate);
+    if (secondarySpeechlanguage.includes(lang)) {
+      srcLang = secondaryTranslatelanguage;
+      targetLang = primaryTranslatelanguage;
+    } 
+
+    TextTranslator(srcLang, targetLang, content, (translate) => {
+      const metadata = { from: srcLang, to: targetLang };
+      const metadataJson = JSON.stringify(metadata);
+      const conversationItem = new Conversation(userId, content, translate, meetingId, metadataJson);
+      writeMessage(conversationItem);
       setConversationList(conversationList => [...conversationList, conversationItem])
       setTooltipOpen(false);
     })
   }
-
-  const addTranslateSecondTab = (content) => {
-    TextTranslator(secondaryTranslatelanguage, primaryTranslatelanguage, content, (translate) => {
-      const conversationItem = new Conversation(userId, content, translate);
-      setConversationList(conversationList => [...conversationList, conversationItem]);
-      setTooltipOpen(false);
-    })
-  }
-
+  
   const realtimeTooltip = (content) => {
     setTooltipOpen(true);
     setTooltipContent(content);
@@ -196,7 +218,7 @@ function Tab(props) {
         cancelButton="Cancel"
         confirmButton="Confirm"
         onCancel={onDialogCancel}
-        onConfirm={onDialogConfirm}
+        onConfirm={onDialogUpdateMessageConfirm}
         content={<TextArea
           placeholder="Type here..."
           onChange={onChangeTextArea}
@@ -238,7 +260,7 @@ function Tab(props) {
                 <ListItem
                   key={item.key} media={<SpeakerPersonIcon size="medium" />}
                   header={item.userId} headerMedia={item.timestamp} content={item.content}
-                  endMedia={<EditIcon size='small' onClick={() => handelEdit(item.key, item.content)} />}
+                  endMedia={<EditIcon size='small' onClick={() => handelMessageEdit(item.key, item.content)} />}
                   style={{ marginBottom: '2px' }}
                   variables={{
                     contentFontSize: `${fontSize}px`

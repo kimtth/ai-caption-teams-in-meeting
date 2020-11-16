@@ -4,7 +4,6 @@ const Message = require('./message-model');
 exports.list = async ctx => {
     const channelId = ctx.request.query.channelId;
     const userId = ctx.request.query.userId;
-    const type = ctx.request.query.type;
   
     if (!channelId) {
       ctx.status = 400;
@@ -14,7 +13,6 @@ exports.list = async ctx => {
     const query = {
       ...(channelId ? { channelId: channelId } : {}),
       ...(userId ? { userId: userId } : {}),
-      ...(type ? { type: type } : {}),
     };
   
     try {

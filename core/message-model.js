@@ -5,8 +5,8 @@ const messageSchema = new Schema({
   id: { type:String, unique: true },
   channelId: String,
   userId: String,
-  conversationText: String,
-  translateText: String,
+  content: String,
+  translateContent: String,
   //type: Number, //1.firstTab 2.secondTab
   timestamp: String,
   metadata: String, //{from:en, to:jp}

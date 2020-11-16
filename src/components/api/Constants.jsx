@@ -11,7 +11,7 @@ export const APPLICATION_ID = '8f92afc0-55a3-41b6-826b-03636cec0330'
 export const TENANT_ID = '2d1ca593-e23f-4d06-a6df-9ca474f47838'
 
 //dev
-export const CONTENT_URL = 'https://5397a1cbc1f6.ngrok.io'
+export const CONTENT_URL = 'https://ai-caption-teams.azurewebsites.net'
 
 //Application
 export const TITLE_SAVE_ONE = '<議事録(Minutes)> \r\n'//'1.[English -> 日本語] \r\n'

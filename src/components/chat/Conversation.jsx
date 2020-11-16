@@ -1,7 +1,7 @@
 import { timeStamp } from '../util/Util'
 import uuid from 'react-uuid'
 
-export default function Conversation(userId, content, translateContent) {
+export default function Conversation(userId, content, translateContent, channelId, metadata) {
     this.key = 0;
     this.userId = '';
     this.timestamp = '';
@@ -16,8 +16,8 @@ export default function Conversation(userId, content, translateContent) {
         this.timestamp = timeStamp();
         this.content = content;
         this.translateContent = translateContent;
-        this.channelId = '';
-        this.metadata = '';
+        this.channelId = channelId;
+        this.metadata = metadata;
     }
 
     this.init();

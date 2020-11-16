@@ -43,6 +43,10 @@ app.use(passport.session())
 const static_pages = new Koa();
 static_pages.use(serve(__dirname + "/build")); //serve the build directory
 app.use(mount("/", static_pages));
+app.use(mount("/privacy", static_pages));
+app.use(mount("/termsofuse", static_pages));
+app.use(mount("/tab", static_pages));
+app.use(mount("/config", static_pages));
 
 const router = new Router();
 router.use('/api', api.routes());
@@ -59,14 +63,14 @@ app.use(async (ctx, next) => {
     }
 })
 
-console.log('>>>>', process.env.NODE_ENV)
+// console.log('>>>>', process.env.NODE_ENV)
 let mongoUri = process.env.MONGO_ENDPOINT
 let port = 80
 if (process.env.NODE_ENV !== 'production') { //development
     port = 8080;
 }
 
-//Kim: socket server
+// //Kim: socket server
 const server = require('http').createServer(app.callback())
 socketJS(server);
 
@@ -75,13 +79,13 @@ server.listen(port, () => {
     console.log(`Listening on (Web/Socket) ${port}`)
     //Kim: useCreateIndex: true: Prevent DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
     //Kim: DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated.
-    mongoose.connect(mongoUri, { useCreateIndex: true, dbName: dbName, useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true })
-        .then(() => {
-            console.log('Connected to MongoDB')
-        })
-        .catch(e => {
-            console.log(e);
-        })
+    // mongoose.connect(mongoUri, { useCreateIndex: true, dbName: dbName, useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true })
+    //     .then(() => {
+    //         console.log('Connected to MongoDB')
+    //     })
+    //     .catch(e => {
+    //         console.log(e);
+    //     })
 })
 
 
