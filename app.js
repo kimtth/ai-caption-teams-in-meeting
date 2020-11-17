@@ -6,7 +6,7 @@ const mount = require("koa-mount");
 const session = require('koa-session');
 const mongoose = require('mongoose');
 const cors = require('@koa/cors');
-const api = require('./core');
+const api = require('./core/index');
 const passport = require('koa-passport')
 
 //Kim: Switch between multiple .env files.
@@ -19,7 +19,7 @@ if (env !== "production") {
 const { socketJS } = require('./core/chat');
 
 const corsOptionsDev = {
-    origin: 'http://localhost:3000',
+    origin: 'https://0ca0dbe4ea96.ngrok.io', //'http://localhost:3000',
     credentials: true
 };
 const app = new Koa();
@@ -36,7 +36,7 @@ app.use(session({}, app))
 app.use(BodyParser()); //Kim: Bodyparser should be set before router.
 
 //Kim: authentication
-require('./core/user-auth')
+require('./core/handler/user-auth')
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -79,13 +79,13 @@ server.listen(port, () => {
     console.log(`Listening on (Web/Socket) ${port}`)
     //Kim: useCreateIndex: true: Prevent DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
     //Kim: DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated.
-    // mongoose.connect(mongoUri, { useCreateIndex: true, dbName: dbName, useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true })
-    //     .then(() => {
-    //         console.log('Connected to MongoDB')
-    //     })
-    //     .catch(e => {
-    //         console.log(e);
-    //     })
+    mongoose.connect(mongoUri, { useCreateIndex: true, dbName: dbName, useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true })
+        .then(() => {
+            console.log('Connected to MongoDB')
+        })
+        .catch(e => {
+            console.log(e);
+        })
 })
 
 

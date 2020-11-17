@@ -2,7 +2,9 @@ import axios from 'axios';
 import qs from 'qs';
 import * as Config from '../api/Constants';
 
-const restful = axios.create({ withCredentials: true }); //Kim: Must set for cors issue.
+const restful = axios.create({
+    withCredentials: true
+}); //Kim: Must set for cors issue.
 
 export const writeMessage = (conversationItem) =>
     restful.post(`${Config.API_URL}/api/message`, conversationItem);
@@ -28,7 +30,10 @@ export const updateTranslateMessage = ({ id, translateContent }) =>
 export const removeMessage = (id) => restful.delete(`${Config.API_URL}/api/message/${id}`);
 
 //login - logout
-export const logInUser = ({ userId }) => {
-    return restful.post(`${Config.API_URL}/api/login`, { userId });
+export const logInUser = (userId) => {
+    let formData = new URLSearchParams();
+    formData.append('userId', userId);
+    //return restful.post(`${Config.API_URL}/api/login?${queryString}`);
+    return restful.post(`${Config.API_URL}/api/login`, formData);
 }
 export const logOutUser = () => restful.get(`${Config.API_URL}/api/logout`);

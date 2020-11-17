@@ -4,7 +4,6 @@ const { Schema } = mongoose;
 const UserSchema = new Schema({
     userId: { type: String, unique: true }, //email
     username: String,
-    password: String,
     publishedDate: {
         type: Date,
         default: Date.now,

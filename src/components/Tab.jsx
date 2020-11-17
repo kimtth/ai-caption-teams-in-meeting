@@ -9,7 +9,7 @@ import * as Config from './api/Constants';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
 import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
-import { writeMessage, listMessages, updateMessage, updateTranslateMessage } from './chat/InvokeAPI'
+import { writeMessage, listMessages, updateMessage, updateTranslateMessage, logInUser } from './chat/InvokeAPI'
 
 
 function Tab(props) {
@@ -48,7 +48,18 @@ function Tab(props) {
       const meetingId = (teamContext['meetingId'] == null || teamContext['meetingId'].length === 0) ? teamContext['channelId'] : teamContext['meetingId'];
       setUserId(userId);
       setMeetingId(meetingId);
-      initializeConversation(userId, meetingId);
+
+      //alert(`userID:${userId} meetingId:${meetingId}`);
+      logInUser(userId)
+        .then(resp => {
+          //alert(JSON.stringify(resp, null, 4))
+          if (resp.data.success) {
+            initializeConversation(userId, meetingId)
+          } else {
+            alert('Incorrect Credentials!');
+          }
+        })
+        .catch(err => console.log(JSON.stringify(err, null, 4)))
     });
   }, [])
 
@@ -61,7 +72,11 @@ function Tab(props) {
     listMessages({ channelId: channelId, userId: userId })
       .then(resp => {
         const conversations = resp.data;
-        setConversationList(conversations);
+        if (conversations.length === 0) {
+          setConversationList([conversationItem]);
+        } else {
+          setConversationList(conversations);
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -162,18 +177,23 @@ function Tab(props) {
     if (secondarySpeechlanguage.includes(lang)) {
       srcLang = secondaryTranslatelanguage;
       targetLang = primaryTranslatelanguage;
-    } 
+    }
 
     TextTranslator(srcLang, targetLang, content, (translate) => {
       const metadata = { from: srcLang, to: targetLang };
       const metadataJson = JSON.stringify(metadata);
       const conversationItem = new Conversation(userId, content, translate, meetingId, metadataJson);
-      writeMessage(conversationItem);
-      setConversationList(conversationList => [...conversationList, conversationItem])
-      setTooltipOpen(false);
+      writeMessage(conversationItem)
+        .then(function (response) {
+          setConversationList(conversationList => [...conversationList, conversationItem])
+          setTooltipOpen(false);
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
     })
   }
-  
+
   const realtimeTooltip = (content) => {
     setTooltipOpen(true);
     setTooltipContent(content);

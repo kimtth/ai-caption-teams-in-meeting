@@ -2,7 +2,7 @@
    "$schema": "https://raw.githubusercontent.com/OfficeDev/microsoft-teams-app-schema/preview/DevPreview/MicrosoftTeams.schema.json",
    "manifestVersion": "devPreview",
    "version": "1.0.0",
-   "id": "aa32a7c1-45d5-455b-8752-882c58aa773d",
+   "id": "aa32a7c1-45d5-455b-8752-882c58aa773c",
    "packageName": "ai-caption.contoso.teams.extension",
    "devicePermissions": [
       "media",
@@ -13,28 +13,28 @@
    ],
    "developer": {
       "name": "skeletonKim",
-      "websiteUrl": "https://ai-caption-teams.azurewebsites.net",
-      "privacyUrl": "https://ai-caption-teams.azurewebsites.net/privacy",
-      "termsOfUseUrl": "https://ai-caption-teams.azurewebsites.net/termsofuse"
+      "websiteUrl": "https://0ca0dbe4ea96.ngrok.io",
+      "privacyUrl": "https://0ca0dbe4ea96.ngrok.io/privacy",
+      "termsOfUseUrl": "https://0ca0dbe4ea96.ngrok.io/termsofuse"
    },
    "icons": {
       "color": "icon-color.png",
       "outline": "icon-outline.png"
    },
    "name": {
-      "short": "AI-Caption (TCS)",
-      "full": "AI-Caption (TCS)"
+      "short": "AI-Caption (DEV)",
+      "full": "AI-Caption (DEV)"
    },
    "description": {
-      "short": "Short description for AI-Caption (TCS).",
-      "full": "Full description of AI-Caption (TCS) for Microsoft Teams."
+      "short": "Short description for AI-Caption (DEV).",
+      "full": "Full description of AI-Caption (DEV) for Microsoft Teams."
    },
    "accentColor": "#FFFFFF",
    "bots": [],
    "composeExtensions": [],
    "configurableTabs": [
       {
-         "configurationUrl": "https://ai-caption-teams.azurewebsites.net/config",
+         "configurationUrl": "https://0ca0dbe4ea96.ngrok.io/config",
          "canUpdateConfiguration": true,
          "scopes": [
             "team",

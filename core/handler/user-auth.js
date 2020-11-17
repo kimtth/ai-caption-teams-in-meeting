@@ -32,7 +32,8 @@ passport.deserializeUser(async function (userId, done) {
 
 passport.use('local', new LocalStrategy({
     usernameField: 'userId', //Kim: Mapping with the request field.
-}, function (username, done) {
+    passwordField: 'userId'
+}, function (username, password, done) {
     fetchUser(username)
         .then(user => {
             if (user.checkUserId(username)) {
