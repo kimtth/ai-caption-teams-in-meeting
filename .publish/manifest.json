@@ -13,9 +13,9 @@
    ],
    "developer": {
       "name": "skeletonKim",
-      "websiteUrl": "https://0ca0dbe4ea96.ngrok.io",
-      "privacyUrl": "https://0ca0dbe4ea96.ngrok.io/privacy",
-      "termsOfUseUrl": "https://0ca0dbe4ea96.ngrok.io/termsofuse"
+      "websiteUrl": "https://7e92fbc7b29f.ngrok.io",
+      "privacyUrl": "https://7e92fbc7b29f.ngrok.io/privacy",
+      "termsOfUseUrl": "https://7e92fbc7b29f.ngrok.io/termsofuse"
    },
    "icons": {
       "color": "icon-color.png",
@@ -34,7 +34,7 @@
    "composeExtensions": [],
    "configurableTabs": [
       {
-         "configurationUrl": "https://0ca0dbe4ea96.ngrok.io/config",
+         "configurationUrl": "https://7e92fbc7b29f.ngrok.io/config",
          "canUpdateConfiguration": true,
          "scopes": [
             "team",

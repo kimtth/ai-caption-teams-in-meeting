@@ -29,7 +29,7 @@ exports.create = async ctx => {
         const msg = await new Message(ctx.request.body).save();
         ctx.body = msg;
     } catch (err) {
-        ctx.throw(422);
+        ctx.throw(422, err);
     }
 };
 

@@ -16,7 +16,7 @@
         "koa-router": "^9.4.0",
         "koa-session": "^6.0.0",
         "koa-static": "^5.0.0",
-        "microsoft-cognitiveservices-speech-sdk": "^1.14.0",
+        "microsoft-cognitiveservices-speech-sdk": "^1.14.1",
         "mongoose": "^5.10.5",
         "nodemon": "^2.0.4",
         "passport-local": "^1.0.0",

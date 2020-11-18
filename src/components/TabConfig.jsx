@@ -19,6 +19,7 @@ function TabConfig(props) {
      * the settings selected by the user.
      */
     microsoftTeams.settings.setSettings({
+      //"contentUrl": `${Config.CONTENT_URL}/tab`,
       "contentUrl": `${Config.CONTENT_URL}/tab`,
       "suggestedDisplayName": "AI-Caption"
     });

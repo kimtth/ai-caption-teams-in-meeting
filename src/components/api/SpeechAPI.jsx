@@ -5,7 +5,7 @@ import { timeStamp } from '../util/Util'
 export function SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTooltip, callback, errorHandler) {
     const subscriptionKey = Config.SPEECH_SUBSCRIPTION_KEY;
     const serviceRegion = Config.SPEECH_SERVICE_REGION;
-    console.log(timeStamp() + `:--${serviceRegion}--`);
+    console.log(timeStamp(), speechLang);
 
     let speechConfig;
     if (subscriptionKey.value === "" || subscriptionKey.value === "subscription") {
@@ -35,7 +35,6 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTo
 
     recognizer.recognizing = function (sender, event) {
         let result = event.result;
-
         if (result.text) {
             realtimeTooltip(result.text);
         }

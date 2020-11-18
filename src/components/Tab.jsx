@@ -37,7 +37,7 @@ function Tab(props) {
   const [noticeOpen, setNoticeOpen] = React.useState(false);
   const messagesEndRef = React.useRef(null);
 
-  const [tabValue, setTabValue] = React.useState(0);
+  const [tabValue, setTabValue] = React.useState(0); 
 
   React.useEffect(() => {
     // Get the user context from Teams and set it in the state
@@ -84,7 +84,13 @@ function Tab(props) {
   }
 
   const handleMode = (mode) => {
-    setTabValue(mode);
+    Config.setActiveTab(mode);
+    console.log('mode:', mode, 'Config.ACTIVE_TAB', Config.ACTIVE_TAB);
+    setTabValue(mode)
+
+    if (continualRecDisable) {
+      StopRecord();
+    }
   }
 
   const handelMessageEdit = (key, content) => {
@@ -106,33 +112,33 @@ function Tab(props) {
     }
     const conversationItem = conversationList[index];
 
-    let srcLanguage = primaryTranslatelanguage;
-    let targetLanguage = secondaryTranslatelanguage;
-    if (tabValue === 1) {
-      srcLanguage = secondaryTranslatelanguage;
-      targetLanguage = primaryTranslatelanguage;
-    }
+    if (conversationItem.metadata) {
+      const jsonMeta = JSON.parse(conversationItem.metadata);
+      const fromLanguage = jsonMeta.from;
+      const toLanguage = jsonMeta.to;
 
-    TextTranslator(srcLanguage, targetLanguage, dialogContent, (translate) => {
-      updateMessage({ id: dialogKey, content: dialogContent })
-        .then(function (response) {
-          updateTranslateMessage({ id: dialogKey, translateContent: translate })
-            .then(function (response) {
+      if (!dialogContent)
+        setDialogContent('-');
+
+      TextTranslator(fromLanguage, toLanguage, dialogContent, (translate) => {
+        updateMessage({ id: dialogKey, content: dialogContent, translateContent: translate })
+          .then(function (response) {
+            if (response.status === 200) {
               conversationItem.content = dialogContent;
               conversationItem.translateContent = translate;
               conversationList[index] = conversationItem;
 
               setConversationList(conversationList);
               setDialogOpen(false);
-            })
-            .catch(function (error) {
-              console.log(error);
-            })
-        })
-        .catch(function (error) {
-          console.log(error);
-        })
-    })
+            } else {
+              console.log('There is something wrong');
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          })
+      })
+    }
   }
 
   const onChangeTextArea = (e) => {
@@ -141,7 +147,7 @@ function Tab(props) {
 
   const indexOfItem = function (target, value) {
     const index = target.map(function (e) {
-      return e.key;
+      return e.id;
     }).indexOf(value);
     return index;
   }
@@ -201,10 +207,12 @@ function Tab(props) {
 
   const ContinualRecord = () => {
     setContinualRecDisable(true);
+    console.log('Config.ACTIVE_TAB', Config.ACTIVE_TAB);
     let speechLang = primarySpeechlanguage;
-    if (tabValue === 1) {
+    if (Config.ACTIVE_TAB === 1) {
       speechLang = secondarySpeechlanguage
     }
+    console.log('speechLang', speechLang);
 
     SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTooltip, (lang, result) => {
       RecordCallback(lang, result);
@@ -218,6 +226,7 @@ function Tab(props) {
         setContinualRecDisable(false);
       });
     }
+    setTooltipOpen(false);
   }
 
   const handleRetry = () => {
@@ -278,21 +287,21 @@ function Tab(props) {
             conversationList.map(item => {
               return [
                 <ListItem
-                  key={item.key} media={<SpeakerPersonIcon size="medium" />}
+                  key={item.id} media={<SpeakerPersonIcon size="medium" />}
                   header={item.userId} headerMedia={item.timestamp} content={item.content}
-                  endMedia={<EditIcon size='small' onClick={() => handelMessageEdit(item.key, item.content)} />}
+                  endMedia={<EditIcon size='small' onClick={() => handelMessageEdit(item.id, item.content)} />}
                   style={{ marginBottom: '2px' }}
                   variables={{
                     contentFontSize: `${fontSize}px`
                   }}
                 />,
-                <ListItem key={`a${item.key}`} media={<TranslationIcon size="medium" />}
+                <ListItem key={`a${item.id}`} media={<TranslationIcon size="medium" />}
                   content={item.translateContent}
                   variables={{
                     contentFontSize: `${fontSize}px`
                   }} />,
-                <Divider key={`b${item.key}`} color="brand" fitted style={{ marginBottom: '2px' }} />,
-                <div key={`c${item.key}`} ref={messagesEndRef}></div>
+                <Divider key={`b${item.id}`} color="brand" fitted style={{ marginBottom: '2px' }} />,
+                <div key={`c${item.id}`} ref={messagesEndRef}></div>
               ]
             })
           }

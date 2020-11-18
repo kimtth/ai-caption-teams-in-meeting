@@ -19,7 +19,7 @@ if (env !== "production") {
 const { socketJS } = require('./core/chat');
 
 const corsOptionsDev = {
-    origin: 'https://0ca0dbe4ea96.ngrok.io', //'http://localhost:3000',
+    origin: process.env.NGROK_ENDPOINT, //'http://localhost:3000',
     credentials: true
 };
 const app = new Koa();
@@ -79,7 +79,8 @@ server.listen(port, () => {
     console.log(`Listening on (Web/Socket) ${port}`)
     //Kim: useCreateIndex: true: Prevent DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
     //Kim: DeprecationWarning: Mongoose: `findOneAndUpdate()` and `findOneAndDelete()` without the `useFindAndModify` option set to false are deprecated.
-    mongoose.connect(mongoUri, { useCreateIndex: true, dbName: dbName, useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true })
+    //Azure Cosmos DB does not support retryWrites.
+    mongoose.connect(mongoUri, { useCreateIndex: true, dbName: dbName, useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true, retryWrites: false })
         .then(() => {
             console.log('Connected to MongoDB')
         })

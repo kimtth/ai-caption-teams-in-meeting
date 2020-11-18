@@ -17,14 +17,10 @@ export const listMessages = ({ channelId, userId }) => {
     return restful.get(`${Config.API_URL}/api/messages?${queryString}`);
 };
 
-export const updateMessage = ({ id, content }) =>
+export const updateMessage = ({ id, content, translateContent }) => 
     restful.put(`${Config.API_URL}/api/message/${id}`, {
-        content,
-    });
-
-export const updateTranslateMessage = ({ id, translateContent }) =>
-    restful.put(`${Config.API_URL}/api/message/${id}`, {
-        translateContent,
+        content: content,
+        translateContent: translateContent
     });
 
 export const removeMessage = (id) => restful.delete(`${Config.API_URL}/api/message/${id}`);
@@ -33,7 +29,6 @@ export const removeMessage = (id) => restful.delete(`${Config.API_URL}/api/messa
 export const logInUser = (userId) => {
     let formData = new URLSearchParams();
     formData.append('userId', userId);
-    //return restful.post(`${Config.API_URL}/api/login?${queryString}`);
     return restful.post(`${Config.API_URL}/api/login`, formData);
 }
 export const logOutUser = () => restful.get(`${Config.API_URL}/api/logout`);
