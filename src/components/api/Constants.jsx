@@ -25,13 +25,14 @@ export const TRANSLATE_INITIAL_SECONDARY_LANGUAGE = 'ja'
 export const WARNING_NOT_EDITABLE = 'Welcome Message is not editable.'
 export const NOTICE_SHARE = 'Please share the channel ID for a subscriber.'
 export const REFRESH_MSG = 'Your network could have disconnected for a while. The browser should be refreshed (F5).'
+export const TCS_DOMAIN = 'tcs.com'
 
 //dev
 export const DEV_MODE = process.env.NODE_ENV !== "production" ? true : false; //kim: development or production
 export const DEV_PORT = DEV_MODE ? '8080' : ''
 export const SocketURL = DEV_MODE ? `http://${window.location.hostname}:${DEV_PORT}` : "";
 export const API_URL = DEV_MODE ? `http://localhost:${DEV_PORT}` : "";
-export let CONTENT_URL = DEV_MODE ? 'https://7e92fbc7b29f.ngrok.io' : "";
+export let CONTENT_URL = DEV_MODE ? 'https://02de10ce05e3.ngrok.io' : "";
 
 export let ACTIVE_TAB = 0;
 export const setActiveTab = (mode) => {

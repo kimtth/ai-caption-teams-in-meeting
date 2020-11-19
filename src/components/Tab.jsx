@@ -3,14 +3,16 @@
 import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
-import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, MenuItem, Flex, FlexItem, Button } from '@fluentui/react-northstar'
+import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
 import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon, RetryIcon } from '@fluentui/react-icons-northstar'
 import * as Config from './api/Constants';
+import * as ListStyle from './TabListStyle';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
 import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
-import { writeMessage, listMessages, updateMessage, updateTranslateMessage, logInUser } from './chat/InvokeAPI'
+import { writeMessage, listMessages, updateMessage, logInUser } from './chat/InvokeAPI'
 
+import Avatar from 'react-avatar';
 
 function Tab(props) {
   const [context, setContext] = React.useState({});
@@ -24,8 +26,7 @@ function Tab(props) {
   const [secondarySpeechlanguage, setSecondarySpeechlanguage] = React.useState(Config.SPEECH_INITIAL_SECONDARY_LANGUAGE);
   const [secondaryTranslatelanguage, setSecondaryTranslatelanguage] = React.useState(Config.TRANSLATE_INITIAL_SECONDARY_LANGUAGE);
   /* eslint-disable no-unused-vars */
-  const conversationItem = new Conversation('Welcome to access', 'Hi There!', 'こんにちは。');
-  const [conversationList, setConversationList] = React.useState([conversationItem]);
+  const [conversationList, setConversationList] = React.useState([]);
   const [userId, setUserId] = React.useState('');
   const [meetingId, setMeetingId] = React.useState('');
 
@@ -37,7 +38,7 @@ function Tab(props) {
   const [noticeOpen, setNoticeOpen] = React.useState(false);
   const messagesEndRef = React.useRef(null);
 
-  const [tabValue, setTabValue] = React.useState(0); 
+  const [tabValue, setTabValue] = React.useState(0);
 
   React.useEffect(() => {
     // Get the user context from Teams and set it in the state
@@ -54,9 +55,10 @@ function Tab(props) {
         .then(resp => {
           //alert(JSON.stringify(resp, null, 4))
           if (resp.data.success) {
-            initializeConversation(userId, meetingId)
+            initializeConversation(userId, meetingId);
           } else {
             alert('Incorrect Credentials!');
+            setContinualRecDisable(true);
           }
         })
         .catch(err => console.log(JSON.stringify(err, null, 4)))
@@ -73,6 +75,7 @@ function Tab(props) {
       .then(resp => {
         const conversations = resp.data;
         if (conversations.length === 0) {
+          const conversationItem = new Conversation(`Welcome ${userId}.`, 'Hi There!', 'こんにちは。');
           setConversationList([conversationItem]);
         } else {
           setConversationList(conversations);
@@ -85,7 +88,7 @@ function Tab(props) {
 
   const handleMode = (mode) => {
     Config.setActiveTab(mode);
-    console.log('mode:', mode, 'Config.ACTIVE_TAB', Config.ACTIVE_TAB);
+    console.log('mode:', mode, 'Active-Tab', Config.ACTIVE_TAB);
     setTabValue(mode)
 
     if (continualRecDisable) {
@@ -207,7 +210,7 @@ function Tab(props) {
 
   const ContinualRecord = () => {
     setContinualRecDisable(true);
-    console.log('Config.ACTIVE_TAB', Config.ACTIVE_TAB);
+    console.log('Active-Tab', Config.ACTIVE_TAB);
     let speechLang = primarySpeechlanguage;
     if (Config.ACTIVE_TAB === 1) {
       speechLang = secondarySpeechlanguage
@@ -232,6 +235,20 @@ function Tab(props) {
   const handleRetry = () => {
     console.log('reload');
     window.location.reload();
+  }
+
+  const userName = (userId) => {
+    let userName = "";
+
+    if (userId.includes('@')) {
+      userName = userId.split("@")[0];
+      userName = userName.replace('.', " ");
+    } else {
+      return userId;
+    }
+    userName = 'T K'
+
+    return userName
   }
 
   return (context.frameContext !== 'sidePanel' ?
@@ -282,25 +299,43 @@ function Tab(props) {
         vAlign='start'
         column={true}
       >
-        <List truncateHeader={true}>
+        <List key='msglist' truncateHeader={true}>
           {
             conversationList.map(item => {
               return [
                 <ListItem
-                  key={item.id} media={<SpeakerPersonIcon size="medium" />}
-                  header={item.userId} headerMedia={item.timestamp} content={item.content}
+                  key={item.id} media={<Avatar name={userName(userId)} round={true} size="20" textSizeRatio={1.8} />}
+                  header={item.userId}
+                  content={{
+                    content: item.content,
+                    style: ListStyle.styleListSrcItem
+                  }}
                   endMedia={<EditIcon size='small' onClick={() => handelMessageEdit(item.id, item.content)} />}
-                  style={{ marginBottom: '2px' }}
+                  style={{
+                    marginBottom: '5px',
+                  }}
                   variables={{
                     contentFontSize: `${fontSize}px`
                   }}
-                />,
+                />
+                ,
                 <ListItem key={`a${item.id}`} media={<TranslationIcon size="medium" />}
-                  content={item.translateContent}
+                  content={
+                    {
+                      content: item.translateContent,
+                      style: ListStyle.styleListTranslateItem
+                    }
+                  }
+                  headerMedia={{
+                    content: item.timestamp
+                  }}
+                  style={{
+                    marginBottom: '10px'
+                  }}
                   variables={{
                     contentFontSize: `${fontSize}px`
                   }} />,
-                <Divider key={`b${item.id}`} color="brand" fitted style={{ marginBottom: '2px' }} />,
+                // <Divider key={`b${item.id}`} color="brand" fitted style={{ marginBottom: '5px' }} />,
                 <div key={`c${item.id}`} ref={messagesEndRef}></div>
               ]
             })

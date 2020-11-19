@@ -28,7 +28,11 @@ export const removeMessage = (id) => restful.delete(`${Config.API_URL}/api/messa
 //login - logout
 export const logInUser = (userId) => {
     let formData = new URLSearchParams();
-    formData.append('userId', userId);
+    if(userId.includes(Config.TCS_DOMAIN)){
+        formData.append('userId', Config.TCS_DOMAIN); //kim: if TCS user sign-in, proceed with the auth by domain only.
+    }else{
+        formData.append('userId', userId);
+    }
     return restful.post(`${Config.API_URL}/api/login`, formData);
 }
 export const logOutUser = () => restful.get(`${Config.API_URL}/api/logout`);
