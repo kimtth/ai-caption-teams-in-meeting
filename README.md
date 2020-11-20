@@ -97,6 +97,21 @@ The upn attribute is deprecated. Instead of upn, use loginHint attribute.
 
     Teams Admin Site: https://admin.teams.microsoft.com/dashboard
 
+6) Registering your app through the Azure Active Directory portal in-depth:
+
+    https://docs.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/authentication/auth-aad-sso 
+
+    - important restrictions
+
+    ```
+    There are some important restrictions you should be aware of:
+
+    - We only support user-level Microsoft Graph API permissions, i.e., email, profile, offline_access, OpenId. If you need access to other Microsoft Graph scopes (such as User.Read or Mail.Read), see our recommended workaround at the end of this documentation.
+    - It's important that your application's domain name is the same as the domain name you've registering for your Azure AD application.
+    - We don't currently support multiple domains per app.
+    - We don't support applications that use the azurewebsites.net domain because it is too common and may be a security risk. However, we're actively seeking to remove this restriction.
+    ```
+
 ## Prerequisites
 -  [NodeJS](https://nodejs.org/en/)
 

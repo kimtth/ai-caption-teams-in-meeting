@@ -4,7 +4,7 @@ import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
-import { EditIcon, SpeakerPersonIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon, RetryIcon } from '@fluentui/react-icons-northstar'
+import { EditIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon, RetryIcon } from '@fluentui/react-icons-northstar'
 import * as Config from './api/Constants';
 import * as ListStyle from './TabListStyle';
 import Conversation from './chat/Conversation';

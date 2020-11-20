@@ -32,7 +32,7 @@ export const DEV_MODE = process.env.NODE_ENV !== "production" ? true : false; //
 export const DEV_PORT = DEV_MODE ? '8080' : ''
 export const SocketURL = DEV_MODE ? `http://${window.location.hostname}:${DEV_PORT}` : "";
 export const API_URL = DEV_MODE ? `http://localhost:${DEV_PORT}` : "";
-export let CONTENT_URL = DEV_MODE ? 'https://02de10ce05e3.ngrok.io' : "";
+export let CONTENT_URL = DEV_MODE ? 'https://fc0914711e60.ngrok.io' : "";
 
 export let ACTIVE_TAB = 0;
 export const setActiveTab = (mode) => {
