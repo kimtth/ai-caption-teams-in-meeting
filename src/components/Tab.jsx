@@ -10,11 +10,17 @@ import * as ListStyle from './TabListStyle';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
 import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
-import { writeMessage, listMessages, updateMessage, logInUser } from './chat/InvokeAPI'
+import { writeMessage, listMessages, updateMessage, logInUser, logOutUser } from './chat/InvokeAPI'
 
 import Avatar from 'react-avatar';
+import useSocket from 'use-socket.io-client';
+import { useBeforeunload } from 'react-beforeunload';
+import { useSelector } from 'react-redux'
 
 function Tab(props) {
+  const autoscroll = useSelector((state) => state.settings.autoscroll);
+  const editable = useSelector((state) => state.settings.editable);
+
   const [context, setContext] = React.useState({});
   const [fontSize, setFontSize] = React.useState(14);
   const [continualRecDisable, setContinualRecDisable] = React.useState(false);
@@ -52,23 +58,58 @@ function Tab(props) {
 
       //alert(`userID:${userId} meetingId:${meetingId}`);
       logInUser(userId)
-        .then(resp => {
-          //alert(JSON.stringify(resp, null, 4))
-          if (resp.data.success) {
-            initializeConversation(userId, meetingId);
-          } else {
-            alert('Incorrect Credentials!');
-            setContinualRecDisable(true);
-          }
-        })
-        .catch(err => console.log(JSON.stringify(err, null, 4)))
+      .then(resp => {
+        console.log(userId);
+        //console.log(JSON.stringify(resp, null, 4))
+        if (resp.data.success) {
+          initializeConversation(userId, meetingId);
+          socketio();
+          socketJoin(userId, meetingId);
+        } else {
+          alert('Incorrect Credentials!');
+          setContinualRecDisable(true);
+        }
+      })
+      .catch(err => console.log(JSON.stringify(err, null, 4)))
     });
   }, [])
+
+  useBeforeunload(() => { socketLeave() }) //Kim: session disconnect
 
   React.useEffect(() => {
     if (messagesEndRef.current)
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [conversationList])
+
+  const [socket] = useSocket(Config.SocketURL, {
+    autoConnect: false, //Kim: very Important!!
+    reconnectionAttempts: 3,
+    transports: ['websocket']
+  });
+
+  const socketio = () => {
+    socket.connect();
+
+    socket.on('reconnect_attempt', () => {
+      socket.io.opts.transports = ['polling', 'websocket'];
+    });
+
+    socket.on('message-client', (conversationItem) => {
+      setConversationList(conversationList => [...conversationList, conversationItem])
+    })
+  }
+
+  const socketJoin = () => {
+    socket.emit('join', userId, meetingId);
+  }
+
+  const socketLeave = () => {
+    socket.emit("remove-event", userId, meetingId)
+    socket.disconnect();
+
+    //Kim: call loginout api
+    logOutUser()
+  }
 
   const initializeConversation = (userId, channelId) => {
     listMessages({ channelId: channelId, userId: userId })
@@ -82,7 +123,7 @@ function Tab(props) {
         }
       })
       .catch(function (error) {
-        console.log(error);
+        console.log('init-conversation', error);
       })
   }
 
@@ -196,6 +237,7 @@ function Tab(props) {
         .then(function (response) {
           setConversationList(conversationList => [...conversationList, conversationItem])
           setTooltipOpen(false);
+          socket.emit('message', conversationItem, meetingId);
         })
         .catch(function (error) {
           console.log(error);

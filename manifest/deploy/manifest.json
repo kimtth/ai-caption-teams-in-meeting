@@ -45,11 +45,6 @@
             "meetingChatTab",
             "meetingDetailsTab",
             "channelTab"
-         ],
-         "sharePointPreviewImage": "",
-         "supportedSharePointHosts": [
-            "sharePointFullPage",
-            "sharePointWebPart"
          ]
       }
    ],

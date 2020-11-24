@@ -19,9 +19,9 @@ handler.put('/message/:id', auth, msgCtrl.update);
 handler.delete('/message/:id', auth, msgCtrl.destroy);
 
 handler.post('/login', (ctx) => {
-  console.log(ctx.request.body.userId)
+  //console.log(ctx.request.body.userId)
   return passport.authenticate('local', (err, user, info, status) => {
-    console.log(err, user, info, status)
+    //console.log(err, user, info, status)
     if (user === false) {
       ctx.body = {
         success: false
