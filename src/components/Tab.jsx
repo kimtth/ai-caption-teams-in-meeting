@@ -4,7 +4,7 @@ import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
-import { EditIcon, TranslationIcon, DownloadIcon, CallRecordingIcon, MicOffIcon, RetryIcon } from '@fluentui/react-icons-northstar'
+import { EditIcon, TranslationIcon, DownloadIcon, BulletsIcon, CallRecordingIcon, MicOffIcon, RetryIcon } from '@fluentui/react-icons-northstar'
 import * as Config from './api/Constants';
 import * as ListStyle from './TabListStyle';
 import Conversation from './chat/Conversation';
@@ -16,10 +16,13 @@ import Avatar from 'react-avatar';
 import useSocket from 'use-socket.io-client';
 import { useBeforeunload } from 'react-beforeunload';
 import { useSelector } from 'react-redux'
+import { useHistory } from "react-router-dom";
 
 function Tab(props) {
   const autoscroll = useSelector((state) => state.settings.autoscroll);
-  const editable = useSelector((state) => state.settings.editable);
+  const diseditable = useSelector((state) => state.settings.diseditable);
+  console.log('autoscoroll', autoscroll, 'diseditable', diseditable)
+  const history = useHistory();
 
   const [context, setContext] = React.useState({});
   const [fontSize, setFontSize] = React.useState(14);
@@ -58,32 +61,36 @@ function Tab(props) {
 
       //alert(`userID:${userId} meetingId:${meetingId}`);
       logInUser(userId)
-      .then(resp => {
-        console.log(userId);
-        //console.log(JSON.stringify(resp, null, 4))
-        if (resp.data.success) {
-          initializeConversation(userId, meetingId);
-          socketio();
-          socketJoin(userId, meetingId);
-        } else {
-          alert('Incorrect Credentials!');
-          setContinualRecDisable(true);
-        }
-      })
-      .catch(err => console.log(JSON.stringify(err, null, 4)))
+        .then(resp => {
+          console.log(userId);
+          //console.log(JSON.stringify(resp, null, 4))
+          if (resp.data.success) {
+            initializeConversation(userId, meetingId);
+            socketio();
+            socketJoin(userId, meetingId);
+          } else {
+            alert('Incorrect Credentials!');
+            setContinualRecDisable(true);
+          }
+        })
+        .catch(err => console.log(JSON.stringify(err, null, 4)))
     });
+
+    microsoftTeams.settings.getSettings((settings) => {
+      console.log(JSON.stringify(settings, null, 4))
+    })
   }, [])
 
   useBeforeunload(() => { socketLeave() }) //Kim: session disconnect
 
   React.useEffect(() => {
-    if (messagesEndRef.current)
+    if (autoscroll && messagesEndRef.current)
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [conversationList])
 
   const [socket] = useSocket(Config.SocketURL, {
     autoConnect: false, //Kim: very Important!!
-    reconnectionAttempts: 3,
+    reconnectionAttempts: 5,
     transports: ['websocket']
   });
 
@@ -274,6 +281,10 @@ function Tab(props) {
     setTooltipOpen(false);
   }
 
+  const handleSettings = () => {
+    history.push('/setting')
+  }
+
   const handleRetry = () => {
     console.log('reload');
     window.location.reload();
@@ -329,9 +340,10 @@ function Tab(props) {
           */
         }
         <Menu defaultActiveIndex={0} activeIndex={tabValue} pointing="end">
-          <Menu.Item index={0} key='english' id='en' content='[EN] → [JP]' icon={<TranslationIcon />} onClick={() => handleMode(0)} />
-          <Divider />
-          <Menu.Item index={1} key='japanese' id='ja' content='[JP] → [EN]' icon={<TranslationIcon />} onClick={() => handleMode(1)} />
+          <Menu.Item index={0} key='english' id='en' content='[EN]→[JP]' icon={<TranslationIcon />} onClick={() => handleMode(0)} />
+          <Menu.Item index={1} key='japanese' id='ja' content='[JP]→[EN]' onClick={() => handleMode(1)} />
+          <Menu.Item key='setting' id='setting' iconOnly icon={<BulletsIcon />} onClick={() => handleSettings()} />
+          <Menu.Divider />
           <Menu.Item key='retry' id='retry' iconOnly icon={<RetryIcon />} onClick={() => handleRetry()} />
         </Menu>
       </Flex>
@@ -352,7 +364,7 @@ function Tab(props) {
                     content: item.content,
                     style: ListStyle.styleListSrcItem
                   }}
-                  endMedia={<EditIcon size='small' onClick={() => handelMessageEdit(item.id, item.content)} />}
+                  endMedia={diseditable ? "" : <EditIcon size='small' onClick={() => handelMessageEdit(item.id, item.content)} />}
                   style={{
                     marginBottom: '5px',
                   }}

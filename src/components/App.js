@@ -9,6 +9,7 @@ import Privacy from "./Privacy";
 import TermsOfUse from "./TermsOfUse";
 import Tab from './Tab';
 import TabConfig from './TabConfig';
+import Settings from './Settings';
 
 /**
  * The main app which handles the initialization and routing
@@ -28,6 +29,7 @@ function App() {
           <Route exact path="/termsofuse" component={TermsOfUse} />
           <Route exact path="/tab" component={TeamsHostError} />
           <Route exact path="/config" component={TeamsHostError} />
+          <Route exact path="/setting" component={TeamsHostError} />
         </Router>        
       );
     }
@@ -38,6 +40,7 @@ function App() {
     return (
       <>
       <Router>
+        <Route exact path="/setting" component={Settings} />
         <Route exact path="/tab" component={Tab} />
         <Route exact path="/config" component={TabConfig} />
       </Router>

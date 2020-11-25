@@ -5,10 +5,7 @@ import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 import * as Config from './api/Constants';
-import { Checkbox, Flex, Header, Text } from '@fluentui/react-northstar'
-
-import { useDispatch } from 'react-redux'
-import { setAutoscroll, setEditable } from './state/settings'
+import { Input, Grid, Flex, Header, Text, TextArea } from '@fluentui/react-northstar'
 /**
  * The 'Config' component is used to display your group tabs
  * user configuration options.  Here you will allow the user to 
@@ -16,24 +13,21 @@ import { setAutoscroll, setEditable } from './state/settings'
  * thier choices and communicate that to Teams to enable the save button.
  */
 function TabConfig(props) {
-  const autoscroll = useSelector((state) => state.settings.autoscroll);
-  const editable = useSelector((state) => state.settings.editable);
-  const dispatch = useDispatch();
-  const onAutoScroll = React.useCallback(() => dispatch(setAutoScroll()), [dispatch]);
-  const onEditable = React.useCallback(() => dispatch(setEditable()), [dispatch]);
-
-  //const [autoScroll, setAutoScroll] = React.useState(true);
-  //const [editMessage, setEditMessage] = React.useState(true);
   /**
    * The content url for the tab is a required value that must be set.
    * The url value is the source url for your configured tab.
    * This allows for the addition of query string parameters based on
    * the settings selected by the user.
    */
+  
+  /* eslint-disable no-unused-vars */
+  const [displayName, setDisplayName] = React.useState('AI-Caption');
+  const [contentUrl, setContentUrl] = React.useState(`${Config.CONTENT_URL}`);
+  /* eslint-disable no-unused-vars */
+
   microsoftTeams.settings.setSettings({
-    // "contentUrl": `${Config.CONTENT_URL}/tab`,
-    "contentUrl": `${Config.CONTENT_URL}/tab`,
-    "suggestedDisplayName": "AI-Caption"
+    "contentUrl": `${contentUrl}/tab`,
+    "suggestedDisplayName": displayName
   });
 
   // Active directory
@@ -55,34 +49,34 @@ function TabConfig(props) {
    * to be valid.  This will enable the save button in the configuration
    * dialog.
    */
-  const handleAutoScroll = (e) => {
-    onAutoScroll();
-  }
-
-  const handleEditMessage = (e) => {
-    onEditable();
-  }
-
   microsoftTeams.settings.setValidityState(true);
 
   return (
     <>
       <Flex gap="gap.small" padding="padding.medium" style={{ backgroundColor: "white" }} column>
         <Flex.Item>
-          <Header as="h3" content="Settings" style={{ color: "black" }} />
-        </Flex.Item>
-        <Flex.Item>
-          <Text size="small" content='select an option to apply view settings.' style={{ color: "black" }} />
+          <Header as="h3" content="Application Context Information" style={{ color: "black" }} />
         </Flex.Item>
         {/* 
         This is where you will add your tab configuration options the user
         can choose when the tab is added to your team/group chat.
        */}
       </Flex>
-      <div style={{ backgroundColor: "white" }} >
-        <Checkbox label="Enable Auto-Scroll to bottom." onChange={handleAutoScroll} defaultChecked={autoscroll} style={{ color: "black" }} />
-        <Checkbox label="Disable to edit message." onChange={handleEditMessage} defaultChecked={editable} style={{ color: "black" }} />
-      </div>
+
+      <Grid
+        styles={{
+          gridTemplateColumns: '4fr 200px',
+          justifyItems: 'start',
+          alignItems: 'center',
+          gap: '10px',
+          backgroundColor: "white"
+        }}
+      >
+        <Text content="- Content URL" style={{ color: "black" }} />
+        <Text style={{ color: 'black'}} disabled content={contentUrl}/>
+        <Text content="- Display Name" style={{ color: "black" }} />
+        <Text style={{ color: 'black'}} content={displayName}/>
+      </Grid>
     </>
   );
 }
