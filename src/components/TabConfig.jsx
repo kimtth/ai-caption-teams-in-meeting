@@ -5,7 +5,7 @@ import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 import * as Config from './api/Constants';
-import { Input, Grid, Flex, Header, Text, TextArea } from '@fluentui/react-northstar'
+import { Grid, Flex, Header, Text } from '@fluentui/react-northstar'
 /**
  * The 'Config' component is used to display your group tabs
  * user configuration options.  Here you will allow the user to 
@@ -19,9 +19,9 @@ function TabConfig(props) {
    * This allows for the addition of query string parameters based on
    * the settings selected by the user.
    */
-  
+
   /* eslint-disable no-unused-vars */
-  const [displayName, setDisplayName] = React.useState('AI-Caption');
+  const [displayName, setDisplayName] = React.useState(`AI-Caption (${Config.DISPLAY_NAME})`);
   const [contentUrl, setContentUrl] = React.useState(`${Config.CONTENT_URL}`);
   /* eslint-disable no-unused-vars */
 
@@ -72,10 +72,12 @@ function TabConfig(props) {
           backgroundColor: "white"
         }}
       >
-        <Text content="- Content URL" style={{ color: "black" }} />
-        <Text style={{ color: 'black'}} disabled content={contentUrl}/>
-        <Text content="- Display Name" style={{ color: "black" }} />
-        <Text style={{ color: 'black'}} content={displayName}/>
+        <Text weight="semibold" content="- Content URL" style={{ color: "black" }} />
+        <Text style={{ color: 'black', display: 'inline-block', width: '200px' }} disabled content={`${contentUrl}`} />
+        <Text weight="semibold" content="- App Name" style={{ color: "black" }} />
+        <Text style={{ color: 'black' }} content={displayName} />
+        <Text weight="semibold" content="- Copyright" style={{ color: "black" }} />
+        <Text style={{ color: 'black', display: 'inline-block', width: '200px' }} disabled content={'Tata Consultancy Services Japan'} />
       </Grid>
     </>
   );

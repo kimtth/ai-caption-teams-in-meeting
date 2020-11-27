@@ -30,9 +30,10 @@ export const TCS_DOMAIN = 'tcs.com'
 //dev
 export const DEV_MODE = process.env.NODE_ENV !== "production" ? true : false; //kim: development or production
 export const DEV_PORT = DEV_MODE ? '8080' : ''
-export const SocketURL = DEV_MODE ? `http://${window.location.hostname}:${DEV_PORT}` : "";
+export const SocketURL = DEV_MODE? `http://${window.location.hostname}:${DEV_PORT}`:"";
 export const API_URL = DEV_MODE ? `http://localhost:${DEV_PORT}` : "";
 export const CONTENT_URL = `https://${window.location.hostname}`;
+export const DISPLAY_NAME = DEV_MODE ? 'DEV' : ''
 
 export let ACTIVE_TAB = 0;
 export const setActiveTab = (mode) => {

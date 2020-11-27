@@ -55,9 +55,5 @@
    "validDomains": [
       "*.ngrok.io",
       "*.azurewebsites.net"
-   ],
-   "webApplicationInfo": {
-      "id": "6ccb1a5c-3419-4cc5-bede-740b0dd0a78f",
-      "resource": "api://ai-caption-teams.azurewebsites.net/6ccb1a5c-3419-4cc5-bede-740b0dd0a78f"
-    }
+   ]
 }

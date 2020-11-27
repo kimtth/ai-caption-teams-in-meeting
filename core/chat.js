@@ -1,15 +1,32 @@
 const socketIo = require("socket.io");
 
-let Channels = {}
-
-const socketJS = function (server, port) {
+const socketJS = function (server) {
+    //console.log('server', JSON.stringify(server, null, 4));
     const io = socketIo(server, {
         pingInterval: 25000, // 25 seconds,
-        pingTimeout: 3600000 // default 1 minute / set 1 hour
+        pingTimeout: 3600000, // default 1 minute / set 1 hour
+        // handlePreflightRequest: function (req, res) { //Kim: cors issue when accessing from iframe. 
+        //     var headers = {
+        //         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        //         "Access-Control-Allow-Methods": "GET,POST",
+        //         'Access-Control-Allow-Origin': null,
+        //         //'Access-Control-Allow-Origin': req.headers.origin,
+        //         'Access-Control-Allow-Credentials': true
+        //     };
+        //     res.writeHead(200, headers);
+        //     res.end();
+        // }
     });
     //io.set("transports", ["websocket"]);
-
     io.on('connection', function (socket) {
+        socket.on('connect', () => {
+            console.log('connect', socket.connected); 
+        });
+    
+        socket.on('connect_failed', () => {
+            console.log('connect_failed', socket.connected); 
+        });    
+
         socket.on("join", (userid, channelid) => {
             try {
                 console.log("join", userid, channelid, socket.id)

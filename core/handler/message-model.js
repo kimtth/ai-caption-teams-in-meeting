@@ -7,7 +7,6 @@ const messageSchema = new Schema({
   userId: String,
   content: String,
   translateContent: String,
-  //type: Number, //1.firstTab 2.secondTab
   timestamp: String,
   metadata: String, //{from:en, to:jp}
   publishedDate: {

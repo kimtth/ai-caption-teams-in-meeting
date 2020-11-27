@@ -65,9 +65,9 @@ function Tab(props) {
           console.log(userId);
           //console.log(JSON.stringify(resp, null, 4))
           if (resp.data.success) {
+            console.log(userId, meetingId);
             initializeConversation(userId, meetingId);
-            socketio();
-            socketJoin(userId, meetingId);
+            socketio(userId, meetingId, (userId, meetingId) => { socketJoin(userId, meetingId) });
           } else {
             alert('Incorrect Credentials!');
             setContinualRecDisable(true);
@@ -91,10 +91,12 @@ function Tab(props) {
   const [socket] = useSocket(Config.SocketURL, {
     autoConnect: false, //Kim: very Important!!
     reconnectionAttempts: 5,
-    transports: ['websocket']
+    transports: ['websocket'],
+    rememberUpgrade: true,
+    forceNode: true
   });
 
-  const socketio = () => {
+  const socketio = (userId, meetingId, callback) => {
     socket.connect();
 
     socket.on('reconnect_attempt', () => {
@@ -104,9 +106,12 @@ function Tab(props) {
     socket.on('message-client', (conversationItem) => {
       setConversationList(conversationList => [...conversationList, conversationItem])
     })
+
+    callback(userId, meetingId);
   }
 
-  const socketJoin = () => {
+  const socketJoin = (userId, meetingId) => {
+    console.log('join', userId, meetingId);
     socket.emit('join', userId, meetingId);
   }
 

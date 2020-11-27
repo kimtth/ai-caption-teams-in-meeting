@@ -112,6 +112,13 @@ The upn attribute is deprecated. Instead of upn, use loginHint attribute.
     - We don't support applications that use the azurewebsites.net domain because it is too common and may be a security risk. However, we're actively seeking to remove this restriction.
     ```
 
+6) Active Directory 
+
+ - Directory (tenant) ID: 2d1ca593-e23f-4d06-a6df-9ca474f47838
+ - Application (client) ID: 6ccb1a5c-3419-4cc5-bede-740b0dd0a78f
+
+ - teams-ad-secret: _5gw~TY51qDDp-aOeLgTDYY7W.24gfWb9.
+
 ## Prerequisites
 -  [NodeJS](https://nodejs.org/en/)
 

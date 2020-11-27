@@ -10,6 +10,7 @@
 
 # production
 /build
+/manifest
 
 # misc
 .DS_Store
