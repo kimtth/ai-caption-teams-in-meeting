@@ -5,12 +5,14 @@
 /.pnp
 .pnp.js
 
+/manifest
+/message
+
 # testing
 /coverage
 
 # production
 /build
-/manifest
 
 # misc
 .DS_Store

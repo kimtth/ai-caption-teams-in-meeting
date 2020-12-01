@@ -3,25 +3,27 @@
 import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
-import { List, ListItem, Divider, Tooltip, TextArea, Dialog, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
+import { List, ListItem, Tooltip, TextArea, Dialog, Menu, Flex, FlexItem, Button } from '@fluentui/react-northstar'
 import { EditIcon, TranslationIcon, DownloadIcon, BulletsIcon, CallRecordingIcon, MicOffIcon, RetryIcon } from '@fluentui/react-icons-northstar'
 import * as Config from './api/Constants';
 import * as ListStyle from './TabListStyle';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
 import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
-import { writeMessage, listMessages, updateMessage, logInUser, logOutUser } from './chat/InvokeAPI'
+import { writeMessage, listMessages, updateMessage, logInUser } from './chat/InvokeAPI'
 
 import Avatar from 'react-avatar';
-import useSocket from 'use-socket.io-client';
+// import useSocket from 'use-socket.io-client';
 import { useBeforeunload } from 'react-beforeunload';
 import { useSelector } from 'react-redux'
-import { useHistory } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
+import { serviceBusPublisher, serviceBusSubscribe, serviceBusClearProcessBeforeLoad } from './api/ServiceBusHandler';
+
 
 function Tab(props) {
   const autoscroll = useSelector((state) => state.settings.autoscroll);
   const diseditable = useSelector((state) => state.settings.diseditable);
-  console.log('autoscoroll', autoscroll, 'diseditable', diseditable)
+  //console.log('autoscoroll', autoscroll, 'diseditable', diseditable)
   const history = useHistory();
 
   const [context, setContext] = React.useState({});
@@ -67,7 +69,7 @@ function Tab(props) {
           if (resp.data.success) {
             console.log(userId, meetingId);
             initializeConversation(userId, meetingId);
-            socketio(userId, meetingId, (userId, meetingId) => { socketJoin(userId, meetingId) });
+            serviceBusSubscribe(userId, meetingId, (data) => { setConversationList([...conversationList, data]) } )
           } else {
             alert('Incorrect Credentials!');
             setContinualRecDisable(true);
@@ -81,47 +83,12 @@ function Tab(props) {
     })
   }, [])
 
-  useBeforeunload(() => { socketLeave() }) //Kim: session disconnect
+  useBeforeunload(() => { serviceBusClearProcessBeforeLoad() }) //Kim: session disconnect
 
   React.useEffect(() => {
     if (autoscroll && messagesEndRef.current)
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [conversationList])
-
-  const [socket] = useSocket(Config.SocketURL, {
-    autoConnect: false, //Kim: very Important!!
-    reconnectionAttempts: 5,
-    transports: ['websocket'],
-    rememberUpgrade: true,
-    forceNode: true
-  });
-
-  const socketio = (userId, meetingId, callback) => {
-    socket.connect();
-
-    socket.on('reconnect_attempt', () => {
-      socket.io.opts.transports = ['polling', 'websocket'];
-    });
-
-    socket.on('message-client', (conversationItem) => {
-      setConversationList(conversationList => [...conversationList, conversationItem])
-    })
-
-    callback(userId, meetingId);
-  }
-
-  const socketJoin = (userId, meetingId) => {
-    console.log('join', userId, meetingId);
-    socket.emit('join', userId, meetingId);
-  }
-
-  const socketLeave = () => {
-    socket.emit("remove-event", userId, meetingId)
-    socket.disconnect();
-
-    //Kim: call loginout api
-    logOutUser()
-  }
 
   const initializeConversation = (userId, channelId) => {
     listMessages({ channelId: channelId, userId: userId })
@@ -249,7 +216,7 @@ function Tab(props) {
         .then(function (response) {
           setConversationList(conversationList => [...conversationList, conversationItem])
           setTooltipOpen(false);
-          socket.emit('message', conversationItem, meetingId);
+          serviceBusPublisher(conversationItem);
         })
         .catch(function (error) {
           console.log(error);
@@ -394,7 +361,6 @@ function Tab(props) {
                   variables={{
                     contentFontSize: `${fontSize}px`
                   }} />,
-                // <Divider key={`b${item.id}`} color="brand" fitted style={{ marginBottom: '5px' }} />,
                 <div key={`c${item.id}`} ref={messagesEndRef}></div>
               ]
             })

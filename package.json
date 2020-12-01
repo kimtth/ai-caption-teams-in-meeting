@@ -3,13 +3,14 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@azure/service-bus": "^7.0.0",
         "@fluentui/react-icons-northstar": "^0.51.2",
         "@fluentui/react-northstar": "^0.51.2",
         "@koa/cors": "^3.1.0",
         "@microsoft/teams-js": "^1.6.0",
-        "auto-sni": "^2.3.2",
         "axios": "^0.21.0",
         "dotenv": "^8.2.0",
+        "flatted": "^3.1.0",
         "koa": "^2.13.0",
         "koa-bodyparser": "^4.3.0",
         "koa-mount": "^4.0.0",
@@ -20,7 +21,7 @@
         "le-acme-core": "^2.1.4",
         "microsoft-cognitiveservices-speech-sdk": "^1.14.1",
         "mongoose": "^5.10.5",
-        "nodemon": "^2.0.4",
+        "nodemon": "^2.0.6",
         "passport-local": "^1.0.0",
         "qs": "^6.9.4",
         "react": "^16.13.1",
@@ -32,10 +33,7 @@
         "react-scripts": "^4.0.0",
         "react-uuid": "^1.0.2",
         "redux": "^4.0.5",
-        "redux-actions": "^2.6.5",
-        "socket.io": "^3.0.3",
-        "socket.io-client": "^3.0.3",
-        "use-socket.io-client": "^1.1.0"
+        "redux-actions": "^2.6.5"
     },
     "scripts": {
         "start": "react-scripts start",
