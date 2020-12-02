@@ -13,16 +13,21 @@ import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop }
 import { writeMessage, listMessages, updateMessage, logInUser } from './chat/InvokeAPI'
 
 import Avatar from 'react-avatar';
-// import useSocket from 'use-socket.io-client';
 import { useBeforeunload } from 'react-beforeunload';
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom';
 import { serviceBusPublisher, serviceBusSubscribe, serviceBusClearProcessBeforeLoad } from './api/ServiceBusHandler';
+import { setLoaded } from './state/settings'
 
 
 function Tab(props) {
   const autoscroll = useSelector((state) => state.settings.autoscroll);
   const diseditable = useSelector((state) => state.settings.diseditable);
+
+  const isinitloaded = useSelector(state => state.settings.isinitloaded);
+  const dispatch = useDispatch();
+  const onIsInitLoaded = React.useCallback((bool) => dispatch(setLoaded(bool)), [dispatch]);
+
   //console.log('autoscoroll', autoscroll, 'diseditable', diseditable)
   const history = useHistory();
 
@@ -40,6 +45,7 @@ function Tab(props) {
   const [conversationList, setConversationList] = React.useState([]);
   const [userId, setUserId] = React.useState('');
   const [meetingId, setMeetingId] = React.useState('');
+  const [userName, setUserName] = React.useState('');
 
   const [tooltipContent, setTooltipContent] = React.useState('');
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
@@ -52,6 +58,7 @@ function Tab(props) {
   const [tabValue, setTabValue] = React.useState(0);
 
   React.useEffect(() => {
+    onIsInitLoaded(true)
     // Get the user context from Teams and set it in the state
     microsoftTeams.getContext((teamContext, error) => {
       setContext(teamContext);
@@ -69,7 +76,14 @@ function Tab(props) {
           if (resp.data.success) {
             console.log(userId, meetingId);
             initializeConversation(userId, meetingId);
-            serviceBusSubscribe(userId, meetingId, (data) => { setConversationList([...conversationList, data]) } )
+            setUserName(userNameGenerator(userId))
+            console.log('isinitloaded:', isinitloaded)
+            if(!isinitloaded){
+              //Kim: For Preventing, already subscribe exception for multiple calling of subscription.
+              console.log('are you ready to subscribe?')
+              serviceBusSubscribe(userId, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })        
+              //serviceBusSubscribe(`${userId.replace("tataKim", "tata.Kim2")}`, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })
+            }   
           } else {
             alert('Incorrect Credentials!');
             setContinualRecDisable(true);
@@ -185,6 +199,17 @@ function Tab(props) {
       let newFontSize = fontSize + 2;
       setFontSize(newFontSize);
     }
+    //Kim: dev testing
+    // const msg = {
+    //   "id" : "11536100-2942-11eb-adc1-0242ac120002",
+    //   "userId" : "tataKim2@aicaption.onmicrosoft.com",
+    //   "timestamp" : "2020/11/17 16:31:29",
+    //   "content" : "The BBQ, they test.",
+    //   "translateContent" : "BBCは、",
+    //   "channelId" : "19:f4a5901a6347493f8232d811ed131710@thread.tacv2",
+    //   "metadata" : "{\"from\":\"en\",\"to\":\"ja\"}"
+    // }
+    // serviceBusPublisher(msg);
   }
 
   const fontSizeDown = () => {
@@ -262,7 +287,7 @@ function Tab(props) {
     window.location.reload();
   }
 
-  const userName = (userId) => {
+  const userNameGenerator = (userId) => {
     let userName = "";
 
     if (userId.includes('@')) {
@@ -271,7 +296,7 @@ function Tab(props) {
     } else {
       return userId;
     }
-    userName = 'T K'
+    console.log("username: ", userName)
 
     return userName
   }
@@ -330,7 +355,7 @@ function Tab(props) {
             conversationList.map(item => {
               return [
                 <ListItem
-                  key={item.id} media={<Avatar name={userName(userId)} round={true} size="20" textSizeRatio={1.8} />}
+                  key={item.id} media={<Avatar name={userName} round={true} size="20" textSizeRatio={1.8} />}
                   header={item.userId}
                   content={{
                     content: item.content,

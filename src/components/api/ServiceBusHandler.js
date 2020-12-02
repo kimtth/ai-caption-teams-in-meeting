@@ -1,5 +1,4 @@
 import { delay,isServiceBusError,ServiceBusClient } from '@azure/service-bus'
-import {parse, stringify} from 'flatted';
 import * as Config from './Constants'
 
 const sbClient = new ServiceBusClient(Config.SERVICE_BUS_CONNECTION_STRING);
@@ -9,7 +8,7 @@ const receiver = sbClient.createReceiver(Config.QUEUE_NAME)
 
 export async function serviceBusPublisher(conversationItem) {
     const message = {
-        body: `"${JSON.stringify(conversationItem)}"`
+        body: conversationItem
     };
 
     try {
@@ -33,7 +32,8 @@ export async function serviceBusSubscribe(userId, meetingId, callback) {
         //console.log(stringify(message))
         console.log(`Received message: ${message.body}`, typeof message.body);
         try {
-            const msg = JSON.parse(message.body.toString());
+            const msg = message.body;
+            console.log(msg.channelId, msg.userId);
             if (msg.channelId === meetingId && msg.userId !== userId) {
                 callback(msg);
             }

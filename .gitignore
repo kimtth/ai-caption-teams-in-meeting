@@ -4,9 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-
-/manifest
 /message
+*.zip
 
 # testing
 /coverage
@@ -24,3 +23,5 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+manifest/demo.zip
+manifest/manifest.json
