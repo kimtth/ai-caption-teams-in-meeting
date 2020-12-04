@@ -19,7 +19,9 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTo
     let autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(speechLang)
     let audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
     let recognizer = SpeechSDK.SpeechRecognizer.FromConfig(speechConfig, autoDetectConfig, audioConfig);
-
+    console.log('autoDetectConfig:', autoDetectConfig)
+    console.log('audioConfig:', audioConfig)
+    console.log('recognizer:', recognizer)
     //spec: startContinuousRecognitionAsync(cb?: () => void, err?: (e: string) => void): void;
     recognizer.startContinuousRecognitionAsync(
         function () {
@@ -46,6 +48,7 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTo
         const detectedLanguage = languageDetectionResult.privLanguage;
 
         if (result.text) {
+            console.log(result.text);
             callback(detectedLanguage, result.text);
         }
     };

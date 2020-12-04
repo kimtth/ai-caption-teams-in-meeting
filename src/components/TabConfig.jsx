@@ -21,7 +21,7 @@ function TabConfig(props) {
    */
 
   /* eslint-disable no-unused-vars */
-  const [displayName, setDisplayName] = React.useState(`AI-Caption (${Config.DISPLAY_NAME})`);
+  const [displayName, setDisplayName] = React.useState(`AI-Caption ${Config.DISPLAY_NAME}`);
   const [contentUrl, setContentUrl] = React.useState(`${Config.CONTENT_URL}`);
   /* eslint-disable no-unused-vars */
 

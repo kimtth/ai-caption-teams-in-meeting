@@ -62,7 +62,7 @@ function Tab(props) {
     // Get the user context from Teams and set it in the state
     microsoftTeams.getContext((teamContext, error) => {
       setContext(teamContext);
-      // alert(JSON.stringify(teamContext, null, 4));
+      console.log(JSON.stringify(teamContext, null, 4));
       const userId = Object.keys(teamContext).length > 0 ? teamContext['loginHint'] : "";
       const meetingId = (teamContext['meetingId'] == null || teamContext['meetingId'].length === 0) ? teamContext['channelId'] : teamContext['meetingId'];
       setUserId(userId);
@@ -78,23 +78,23 @@ function Tab(props) {
             initializeConversation(userId, meetingId);
             setUserName(userNameGenerator(userId))
             console.log('isinitloaded:', isinitloaded)
-            if(!isinitloaded){
+            permissonhandle();
+            if (!isinitloaded) {
               //Kim: For Preventing, already subscribe exception for multiple calling of subscription.
               console.log('are you ready to subscribe?')
-              serviceBusSubscribe(userId, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })        
+              serviceBusSubscribe(userId, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })
               //serviceBusSubscribe(`${userId.replace("tataKim", "tata.Kim2")}`, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })
-            }   
+            }
           } else {
             alert('Incorrect Credentials!');
             setContinualRecDisable(true);
           }
         })
-        .catch(err => console.log(JSON.stringify(err, null, 4)))
+        .catch(err => {
+            console.log(JSON.stringify(err, null, 4))
+            alert('Incorrect Credentials!');
+          })
     });
-
-    microsoftTeams.settings.getSettings((settings) => {
-      console.log(JSON.stringify(settings, null, 4))
-    })
   }, [])
 
   useBeforeunload(() => { serviceBusClearProcessBeforeLoad() }) //Kim: session disconnect
@@ -103,6 +103,18 @@ function Tab(props) {
     if (autoscroll && messagesEndRef.current)
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [conversationList])
+
+  const permissonhandle = () => {
+    navigator.permissions.query({ name: 'microphone' }).then(function(result) {
+      if (result.state == 'granted') {
+        // Access granted
+        console.log('Permissons', result.state)
+      } else if (result.state == 'prompt') {
+        // Access has not been granted
+        console.log('Permissons has not been granted')
+      }
+    });
+  }
 
   const initializeConversation = (userId, channelId) => {
     listMessages({ channelId: channelId, userId: userId })
@@ -271,6 +283,7 @@ function Tab(props) {
 
   const StopRecord = () => {
     if (continualRecDisable) {
+      console.log('stop record', recognizer);
       SpeechToTextContinualStop(recognizer, () => {
         setContinualRecDisable(false);
       });
@@ -301,7 +314,9 @@ function Tab(props) {
     return userName
   }
 
-  return (context.frameContext !== 'sidePanel' ?
+  const widthPx = '270px'
+
+  return (context.frameContext ?
     <>
       <Dialog
         open={noticeOpen}
@@ -319,13 +334,13 @@ function Tab(props) {
           placeholder="Type here..."
           onChange={onChangeTextArea}
           value={dialogContent}
-          styles={{ width: '98%', height: '150px' }} />}
+          styles={{ width: '96%', height: '150px' }} />}
         header="Please edit here."
         closeOnOutsideClick={false}
       />
       <Flex
         gap="gap.small"
-        styles={{ width: '315px' }}
+        styles={{ width: widthPx }}
         padding="padding.medium"
         column={true}
       >
@@ -337,16 +352,16 @@ function Tab(props) {
           */
         }
         <Menu defaultActiveIndex={0} activeIndex={tabValue} pointing="end">
-          <Menu.Item index={0} key='english' id='en' content='[EN]→[JP]' icon={<TranslationIcon />} onClick={() => handleMode(0)} />
-          <Menu.Item index={1} key='japanese' id='ja' content='[JP]→[EN]' onClick={() => handleMode(1)} />
-          <Menu.Item key='setting' id='setting' iconOnly icon={<BulletsIcon />} onClick={() => handleSettings()} />
-          <Menu.Divider />
           <Menu.Item key='retry' id='retry' iconOnly icon={<RetryIcon />} onClick={() => handleRetry()} />
+          <Menu.Divider />
+          <Menu.Item index={0} key='primary' id='primary' content='[EN→JP]' onClick={() => handleMode(0)} />
+          <Menu.Item index={1} key='secondary' id='secondary' content='[JP→EN]' onClick={() => handleMode(1)} />
+          <Menu.Item key='setting' id='setting' iconOnly icon={<BulletsIcon />} onClick={() => handleSettings()} />
         </Menu>
       </Flex>
       <Flex
         gap="gap.medium"
-        styles={{ width: '315px', height: '78vh', overflowX: 'hidden', overflowY: 'auto' }}
+        styles={{ width: widthPx, height: '77vh', overflowX: 'hidden', overflowY: 'auto' }}
         vAlign='start'
         column={true}
       >
@@ -395,7 +410,7 @@ function Tab(props) {
       <Flex
         gap="gap.small"
         padding="padding.medium"
-        styles={{ width: '315px', backgroundColor: '#33344A' }}
+        styles={{ width: widthPx, backgroundColor: '#33344A' }}
       >
         <FlexItem push>
           <Button icon={<DownloadIcon />} inverted iconOnly primary styles={{ backgroundColor: '#201F1F' }} onClick={handleDownloadEvent} />
@@ -403,11 +418,11 @@ function Tab(props) {
         <Tooltip trigger={<Button content="." size="small" iconOnly styles={{ visibility: 'hidden' }} />} content={tooltipContent} open={tooltipOpen} />
         <Button circular inverted content="+" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeUp} />
         <Button circular inverted content="-" iconOnly secondary styles={{ backgroundColor: '#201F1F' }} onClick={fontSizeDown} />
-        <Button icon={<CallRecordingIcon />} inverted content="REC" primary styles={{ backgroundColor: '#C4314B', paddingLeftRightValue: 2 }} disabled={continualRecDisable} onClick={ContinualRecord} />
+        <Button icon={<CallRecordingIcon />} inverted iconOnly primary styles={{ backgroundColor: '#C4314B', paddingLeftRightValue: 2 }} disabled={continualRecDisable} onClick={ContinualRecord} />
         <Button icon={<MicOffIcon />} inverted iconOnly primary styles={{ backgroundColor: '#2A4A51' }} onClick={StopRecord} />
       </Flex>
     </>
-    : "HoHoHo !!"
+    : "Congratulations! Your in-meeting app is going to be displayed during the scheduled meeting."
   );
 }
 export default Tab;

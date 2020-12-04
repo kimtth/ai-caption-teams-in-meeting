@@ -97,6 +97,12 @@ The upn attribute is deprecated. Instead of upn, use loginHint attribute.
 
     Teams Admin Site: https://admin.teams.microsoft.com/dashboard
 
+    MS O365 developer dashborad: https://developer.microsoft.com/en-us/microsoft-365/profile/
+    
+    Spare Administrator Account: tataKim@subaicaption.onmicrosoft.com
+
+    Test Account (subaicaption.onmicrosoft.com) : `boot2@@2`
+
 6) Registering your app through the Azure Active Directory portal in-depth:
 
     https://docs.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/authentication/auth-aad-sso 
@@ -118,6 +124,19 @@ The upn attribute is deprecated. Instead of upn, use loginHint attribute.
  - Application (client) ID: 6ccb1a5c-3419-4cc5-bede-740b0dd0a78f
 
  - teams-ad-secret: _5gw~TY51qDDp-aOeLgTDYY7W.24gfWb9.
+
+10) How to activate the app during the meeting
+
+    https://github.com/OfficeDev/microsoft-teams-sample-meetings-token#step-6-sideload-the-app-in-a-teams-desktop-client
+
+ - 1.Create a meeting with few test participants, ideally with a mix of Presenters and Attendees.
+ - 2.Once meeting is created, go to the meeting details page and click on the "Add tab" (+) button.
+ - 3.the pop-up that opens, click on "Manage apps".
+ - 4.Click on "Upload a custom app" and upload the .zip file that was created in the previous steps. This adds the app to the meeting.
+ - 5.Click on the "Add tab" button again. Now in the app selection page, the app should be visible as a "Meeting optimized tab".
+ - 6.Select the AI-Caption app.
+ - 7.Now the app will be visible in the meeting chat.
+ - 8.Start the meeting and the icon should be visible in the meeting control bar.
 
 ## Prerequisites
 -  [NodeJS](https://nodejs.org/en/)

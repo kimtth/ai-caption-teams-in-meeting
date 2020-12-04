@@ -13,9 +13,9 @@
    ],
    "developer": {
       "name": "skeletonKim",
-      "websiteUrl": "https://fc0914711e60.ngrok.io",
-      "privacyUrl": "https://fc0914711e60.ngrok.io/privacy",
-      "termsOfUseUrl": "https://fc0914711e60.ngrok.io/termsofuse"
+      "websiteUrl": "https://29e709812a8c.ngrok.io",
+      "privacyUrl": "https://29e709812a8c.ngrok.io/privacy",
+      "termsOfUseUrl": "https://29e709812a8c.ngrok.io/termsofuse"
    },
    "icons": {
       "color": "icon-color.png",
@@ -34,7 +34,7 @@
    "composeExtensions": [],
    "configurableTabs": [
       {
-         "configurationUrl": "https://fc0914711e60.ngrok.io/config",
+         "configurationUrl": "https://29e709812a8c.ngrok.io/config",
          "canUpdateConfiguration": true,
          "scopes": [
             "team",
@@ -42,7 +42,6 @@
          ],
          "context": [
             "channelTab",
-            "privateChatTab",
             "privateChatTab",
             "meetingChatTab",
             "meetingDetailsTab",
@@ -60,6 +59,6 @@
    ],
    "webApplicationInfo": {
       "id": "6ccb1a5c-3419-4cc5-bede-740b0dd0a78f",
-      "resource": "api://fc0914711e60.ngrok.io/6ccb1a5c-3419-4cc5-bede-740b0dd0a78f"
+      "resource": "api://29e709812a8c.ngrok.io/6ccb1a5c-3419-4cc5-bede-740b0dd0a78f"
    }
 }
