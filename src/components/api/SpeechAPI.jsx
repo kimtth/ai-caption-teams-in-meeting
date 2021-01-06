@@ -17,7 +17,8 @@ export function SpeechToTextContinualStart(speechLang, setRecognizer, realtimeTo
     }
 
     let autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(speechLang)
-    let audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+    //let audioConfig = SpeechSDK.AudioConfig.fromMicrophoneInput('MMDEVAPI\\AudioEndpoints')//fromDefaultMicrophoneInput();
+    let audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput()
     let recognizer = SpeechSDK.SpeechRecognizer.FromConfig(speechConfig, autoDetectConfig, audioConfig);
     console.log('autoDetectConfig:', autoDetectConfig)
     console.log('audioConfig:', audioConfig)

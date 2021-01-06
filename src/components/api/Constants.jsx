@@ -32,6 +32,7 @@ export const DEV_PORT = DEV_MODE ? '8080' : ''
 export const API_URL = DEV_MODE ? `http://localhost:${DEV_PORT}` : '';
 export const CONTENT_URL = `https://${window.location.hostname}`;
 export const DISPLAY_NAME = DEV_MODE ? '(DEV)' : ''
+export const SocketURL = DEV_MODE? `http://${window.location.hostname}:${DEV_PORT}`:"";
 
 export let ACTIVE_TAB = 0;
 export const setActiveTab = (mode) => {

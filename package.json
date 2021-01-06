@@ -33,7 +33,10 @@
         "react-scripts": "^4.0.0",
         "react-uuid": "^1.0.2",
         "redux": "^4.0.5",
-        "redux-actions": "^2.6.5"
+        "redux-actions": "^2.6.5",
+        "socket.io": "2.3.0",
+        "socket.io-client": "2.3.0",
+        "use-socket.io-client": "^1.1.0"
     },
     "scripts": {
         "start": "react-scripts start",

@@ -10,20 +10,20 @@ import * as ListStyle from './TabListStyle';
 import Conversation from './chat/Conversation';
 import { saveTextArea } from './util/Util'
 import { TextTranslator, SpeechToTextContinualStart, SpeechToTextContinualStop } from './api/SpeechAPI';
-import { writeMessage, listMessages, updateMessage, logInUser } from './chat/InvokeAPI'
+import { writeMessage, listMessages, updateMessage, logInUser, logOutUser } from './chat/InvokeAPI'
 
 import Avatar from 'react-avatar';
+import useSocket from 'use-socket.io-client';
 import { useBeforeunload } from 'react-beforeunload';
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom';
-import { serviceBusPublisher, serviceBusSubscribe, serviceBusClearProcessBeforeLoad } from './api/ServiceBusHandler';
+//import { serviceBusPublisher, serviceBusSubscribe, serviceBusClearProcessBeforeLoad } from './api/ServiceBusHandler';
 import { setLoaded } from './state/settings'
 
 
 function Tab(props) {
   const autoscroll = useSelector((state) => state.settings.autoscroll);
   const diseditable = useSelector((state) => state.settings.diseditable);
-
   const isinitloaded = useSelector(state => state.settings.isinitloaded);
   const dispatch = useDispatch();
   const onIsInitLoaded = React.useCallback((bool) => dispatch(setLoaded(bool)), [dispatch]);
@@ -79,33 +79,72 @@ function Tab(props) {
             setUserName(userNameGenerator(userId))
             console.log('isinitloaded:', isinitloaded)
             permissonhandle();
-            if (!isinitloaded) {
-              //Kim: For Preventing, already subscribe exception for multiple calling of subscription.
-              console.log('are you ready to subscribe?')
-              serviceBusSubscribe(userId, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })
-              //serviceBusSubscribe(`${userId.replace("tataKim", "tata.Kim2")}`, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })
-            }
+            socketio(userId, meetingId, (userId, meetingId) => { socketJoin(userId, meetingId) });
+
+            // Azure Service Bus
+            // if (!isinitloaded) {
+            //   //Kim: For Preventing, already subscribe exception for multiple calling of subscription.
+            //   console.log('are you ready to subscribe?')
+            //   serviceBusSubscribe(userId, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })
+            //   //serviceBusSubscribe(`${userId.replace("tataKim", "tata.Kim2")}`, meetingId, (data) => { setConversationList(conversationList => [...conversationList, data]) })
+            // }
           } else {
             alert('Incorrect Credentials!');
             setContinualRecDisable(true);
           }
         })
         .catch(err => {
-            console.log(JSON.stringify(err, null, 4))
-            alert('Incorrect Credentials!');
-          })
+          console.log(JSON.stringify(err, null, 4))
+          alert('Incorrect Credentials!');
+        })
     });
   }, [])
 
-  useBeforeunload(() => { serviceBusClearProcessBeforeLoad() }) //Kim: session disconnect
+  //useBeforeunload(() => { serviceBusClearProcessBeforeLoad() }) //Kim: session disconnect
+  useBeforeunload(() => { socketLeave() }) //Kim: session disconnect
 
   React.useEffect(() => {
     if (autoscroll && messagesEndRef.current)
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [conversationList])
 
+  const [socket] = useSocket(Config.SocketURL, {
+    autoConnect: false, //Kim: very Important!!
+    reconnectionAttempts: 5,
+    transports: ['websocket'],
+    rememberUpgrade: true,
+    forceNode: true
+  });
+
+  const socketio = (userId, meetingId, callback) => {
+    socket.connect();
+
+    socket.on('reconnect_attempt', () => {
+      socket.io.opts.transports = ['polling', 'websocket'];
+    });
+
+    socket.on('message-client', (conversationItem) => {
+      setConversationList(conversationList => [...conversationList, conversationItem])
+    })
+
+    callback(userId, meetingId);
+  }
+
+  const socketJoin = (userId, meetingId) => {
+    console.log('join', userId, meetingId);
+    socket.emit('join', userId, meetingId);
+  }
+
+  const socketLeave = () => {
+    socket.emit("remove-event", userId, meetingId)
+    socket.disconnect();
+
+    //Kim: call loginout api
+    logOutUser()
+  }
+
   const permissonhandle = () => {
-    navigator.permissions.query({ name: 'microphone' }).then(function(result) {
+    navigator.permissions.query({ name: 'microphone' }).then(function (result) {
       if (result.state == 'granted') {
         // Access granted
         console.log('Permissons', result.state)
@@ -253,7 +292,8 @@ function Tab(props) {
         .then(function (response) {
           setConversationList(conversationList => [...conversationList, conversationItem])
           setTooltipOpen(false);
-          serviceBusPublisher(conversationItem);
+          socket.emit('message', conversationItem, meetingId);
+          //serviceBusPublisher(conversationItem);
         })
         .catch(function (error) {
           console.log(error);

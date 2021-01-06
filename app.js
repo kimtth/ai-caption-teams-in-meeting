@@ -18,6 +18,8 @@ if (env !== "production") {
     })
 }
 
+const { socketJS } = require('./core/chat');
+
 const corsOptionsDev = {
     origin: process.env.NGROK_ENDPOINT,
     credentials: true
@@ -75,6 +77,7 @@ if (process.env.NODE_ENV !== 'production') { //development
 
 // //Kim: socket server
 const server = require('http').createServer(app.callback())
+socketJS(server);
 
 let dbName = process.env.DB_NAME;
 server.listen(port, () => {
